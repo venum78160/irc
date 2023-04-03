@@ -1,16 +1,10 @@
-#include <iostream>
-#include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <poll.h>
-#include <vector>
-
-#define MAX_CLIENTS 10
-#define BUFFER_SIZE 1024
+#include "Serveur.hpp"
 
 int main(int argc, char *argv[]) {
 
     // Création du socket d'écoute
+
+    Serveur serv(argv[1], argv[2]);
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == -1) {
         std::cerr << "Erreur lors de la création du socket d'écoute" << std::endl;
@@ -50,10 +44,11 @@ int main(int argc, char *argv[]) {
         }
 
         // Parcours de la structure pollfd pour traiter les événements
-        for (int i = 0; i < pollFds.size(); i++) {
-
+        for (int i = 0; i < pollFds.size(); i++)
+        {
             // Vérification si un événement s'est produit sur le socket d'écoute
-            if (pollFds[i].fd == serverSocket && pollFds[i].revents & POLLIN) {
+            if (pollFds[i].fd == serverSocket && pollFds[i].revents & POLLIN)
+            {
 
                 // Acceptation de la connexion entrante
                 struct sockaddr_in clientAddr;
@@ -72,7 +67,11 @@ int main(int argc, char *argv[]) {
             }
 
             // Vérification si un événement s'est produit sur l'un des sockets des clients
-            else if (pollF
+            else if (pollFds[i].fd != serverSocket && pollFds[i].revents & POLLIN)
+            {
+              eventClient(pollFds[i]);
+            }
+        }
 
 struct pollfd fds[10];
 int nfds = 1;

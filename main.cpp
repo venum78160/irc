@@ -4,19 +4,10 @@
 #include <map>
 #include <sstream>
 
+
+#include "Serveur.hpp"
 using namespace std;
 
-// Définir une structure pour les clients
-struct client {
-    int sock_fd;
-    string nickname;
-    string username;
-    string realname;
-    string hostname;
-    string servername;
-    string mode;
-    vector<string> channels;
-};
 
 // Définir une structure pour les canaux
 struct channel {
@@ -77,6 +68,8 @@ void handle_command(string command, client* sender, map<string, channel*>& chann
 // Envoie message à nom_utilisateur,
 // message
 // Envoie un message dans le channel courant.
+// kick un utilisateur
+// BAn un utilisateur
 
 // Le client se connecte au serveur IRC en utilisant une adresse IP et un port spécifiques. Le serveur écoute sur ce port et attend les connexions entrantes.
 
