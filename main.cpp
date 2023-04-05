@@ -5,47 +5,48 @@
 #include <sstream>
 
 
-#include "Serveur.hpp"
-using namespace std;
+#include "serveur.hpp"
 
-
-// Définir une structure pour les canaux
-struct channel {
-    string name;
-    string topic;
-    vector<client*> members;
-};
-
+/*
 // Définir une fonction pour traiter les commandes IRC
-void handle_command(string command, client* sender, map<string, channel*>& channels, map<int, client*>& clients);
+void handle_command(std::string command, Client* sender, std::map<std::string, channel*>& channels, std::map<int, client*>& clients);
 
 // Définir une fonction pour gérer les connexions de nouveaux clients
-void handle_new_connection(int sock_fd, map<int, client*>& clients);
+void handle_new_connection(int sock_fd, std::map<int, Client*>& clients);
 
 // Définir une fonction pour gérer les messages envoyés par les clients
-void handle_client_message(client* sender, string message, map<string, channel*>& channels, map<int, client*>& clients);
+void handle_client_message(Client* sender, std::string message, std::map<std::string, channel*>& channels, std::map<int, client*>& clients);
+void handle_new_connection(int sock_fd, std::map<int, Client*>& clients) {
+    // Créer un nouveau client et l'ajouter à la map des clients
+}
 
-int main() {
-    // Initialiser le serveur et attendre les connexions entrantes
+void handle_client_message(Client* sender, std::string message, std::map<std::string, channel*>& channels, std::map<int, client*>& clients) {
+    // Analyser le message pour déterminer s'il s'agit d'une commande ou d'un message normal
+    // Si c'est une commande, appeler handle_command
+    // Sinon, acheminer le message vers tous les clients dans le même canal que l'expéditeur
+}
+
+void handle_command(std::string command, Client* sender, std::map<std::string, channel*>& channels, std::map<int, client*>& clients) {
+    // Interpréter la commande et effectuer les actions nécessaires, telles que rejoindre un canal, quitter un canal, changer de pseudonyme, etc.
+}
+*/
+
+int main(int ac, char **av) {
+
+    if (ac != 3)
+    {
+        std::cerr << "Usage: " << av[0] << " <port> <password>" << std::endl;
+        return 1;
+    }
+    Serveur server(av[1], av[2]);
+
+    server.start();
     // Gérer les connexions en appelant handle_new_connection
     // Gérer les messages en appelant handle_client_message
     // Gérer les commandes en appelant handle_command
     return 0;
 }
 
-void handle_new_connection(int sock_fd, map<int, client*>& clients) {
-    // Créer un nouveau client et l'ajouter à la map des clients
-}
-
-void handle_client_message(client* sender, string message, map<string, channel*>& channels, map<int, client*>& clients) {
-    // Analyser le message pour déterminer s'il s'agit d'une commande ou d'un message normal
-    // Si c'est une commande, appeler handle_command
-    // Sinon, acheminer le message vers tous les clients dans le même canal que l'expéditeur
-}
-
-void handle_command(string command, client* sender, map<string, channel*>& channels, map<int, client*>& clients) {
-    // Interpréter la commande et effectuer les actions nécessaires, telles que rejoindre un canal, quitter un canal, changer de pseudonyme, etc.
-}
 
 
 // /create nom_channel
