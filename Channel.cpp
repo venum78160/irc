@@ -6,13 +6,11 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/06 01:08:13 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/06 01:20:33 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
-
-Channel::Channel( void ) { }
 
 Channel::~Channel( void ) { }
 
@@ -20,6 +18,28 @@ Channel::Channel( std::string name, Client &creator ) : _name(name)
 {
 	std::pair<Client, bool> newUser(creator, true);
 	(this->_users).insert(newUser);
+}
+
+std::string Channel::getName( void ) const
+{
+	return (this->_name);
+}
+
+void Channel::rename( std::string name )
+{
+	if (checkNameValidity(name) == false)
+		throw channelException("Invalid name.");
+	this->_name = name;
+}
+
+unsigned int Channel::getUserLimit( void ) const
+{
+	return (this->_maxUsers);
+}
+
+void Channel::setUserLimit( unsigned int limit )
+{
+	this->_maxUsers = limit;
 }
 
 bool	Channel::checkNameValidity( std::string &name )
