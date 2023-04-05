@@ -18,14 +18,28 @@ Serveur::~Serveur()
 {
 }
 
-void	Serveur::eventClient( pollfd Client)
+void	Serveur::eventClient(pollfd Client)
 {
     char	buffer[BUFFER_SIZE];
+    memset(buffer, 0, BUFFER_SIZE);
     int bytes_read = recv(Client.fd, buffer, sizeof(buffer), 0);
     if (bytes_read <= 0)
     {
         // Le client s'est déconnecté, supprimer son descripteur de fichier
-        close(Client.fd);
+        std::cout << "Client disconnected" << std::endl;
+        //close(Client.fd); on le close déjà dans le POLLHUP event
+    }
+    else
+    {
+        // Traiter le message reçu
+        std::string message(buffer);
+        std::cout << "Message reçu : " << message << std::endl;
+        if (Client.revents & POLLOUT)
+        {
+            std::cout << "Sending message to client" << std::endl;
+            send(Client.fd, "We have received ur request", strlen("We have received ur request"), 0);
+        }
+
     }
 }
 
@@ -58,23 +72,19 @@ void	Serveur::run()
                 }
 
                 // Ajout du descripteur de fichier du client à la structure pollfd
-                pollfd clientPollFd = {clientSocket, POLLIN, 0};
+                pollfd clientPollFd = {clientSocket, POLLIN | POLLOUT | POLLHUP, 0};
                 _pollFds.push_back(clientPollFd);
 
                 std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
             }
-
                 // Vérification si un événement s'est produit sur l'un des sockets des clients
             else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLIN)
-            {
                 eventClient(_pollFds[i]);
-            }
             if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLHUP)
             {
                 //delete client from vector of clients
                 close(_pollFds[i].fd);
                 _pollFds.erase(_pollFds.begin() + i);
-                std::cout << "Client disconnected" << std::endl;
             }
         }
     }

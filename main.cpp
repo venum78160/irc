@@ -38,7 +38,7 @@ int main(int ac, char **av) {
         std::cerr << "Usage: " << av[0] << " <port> <password>" << std::endl;
         return 1;
     }
-    Serveur server(av[1], av[2]);
+    Serveur server(av[2], av[1]);
 
     server.start();
     // Gérer les connexions en appelant handle_new_connection
