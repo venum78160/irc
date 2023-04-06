@@ -87,6 +87,27 @@ void Serveur::handleFirstConnection(int clientSocket)
     }
 }
 
+int Serveur::checkNameValidity( std::string &name )
+{
+	unsigned int	nameLen = name.size();
+
+	// lowercase the name
+	std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+	if (this->_channels.find(name) != this->_channels.end())
+		return (CHANNELALREADYEXISTS);
+	if (nameLen > 50)
+		return (NAMETOOLONG);
+	if (name[0] != '#')
+		return (NOTENOUGHPARAMS);
+	for (int i = 0; i < nameLen; i++)
+	{
+		if (isspace(name[i]) || name[i] == ',' || name[i] == 7)
+			return (WRONGNAME);
+	}
+
+	return (VALIDNAME);
+}
+
 void Serveur::joinCommand(std::string channelName, Client &client)
 {
     if (channelName[0] != '#')

@@ -17,3 +17,9 @@
 
 #include "client.hpp"
 
+// ERROR CODES
+#define NAMETOOLONG 0
+#define NOTENOUGHPARAMS 1
+#define WRONGNAME 2
+#define CHANNELALREADYEXISTS 3
+#define VALIDNAME 4

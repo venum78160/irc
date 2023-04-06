@@ -36,5 +36,6 @@ public:
 	void	handleFirstConnection(int clientSocket);
 	void	joinCommand(std::string channelName, Client &client);
 	Client 	*getClientbyFd(int fd);
+	int		checkNameValidity( std::string &name )
 };
 
