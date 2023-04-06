@@ -1,5 +1,5 @@
 #pragma once
-#include "serveur.hpp"
+#include "ft_irc.hpp"
 
 // sock_fd_ : un entier qui représente le descripteur de fichier de la socket associée au client. Ce descripteur est utilisé par le serveur pour envoyer des données au client ou pour recevoir des données du client.
 // nickname_ : une chaîne de caractères qui contient le surnom du client.

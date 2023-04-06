@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <fcntl.h>
 #include <netinet/ip.h> 
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -14,6 +15,7 @@
 #include <poll.h>
 #include <vector>
 #include <map>
+#include <sstream>
 
 #include "client.hpp"
 #include "serveur.hpp"

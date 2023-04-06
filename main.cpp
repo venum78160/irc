@@ -1,11 +1,16 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <sstream>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.cpp                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: vl-hotel <vl-hotel@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/06 20:38:50 by vl-hotel          #+#    #+#             */
+/*   Updated: 2023/04/06 20:38:51 by vl-hotel         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-
-#include "serveur.hpp"
+#include "ft_irc.hpp"
 
 /*
 // Définir une fonction pour traiter les commandes IRC

@@ -17,14 +17,14 @@ public:
     ~Serveur();
     void	start();
 	void	run();
-	void	eventClient( pollfd Client);
+	void	eventClient( pollfd Client); // Ange
 	std::vector<Channel*>	getServerChannels();
 	void	handleMessage(std::string message, int fd);
 	void	handleFirstConnection(int clientSocket);
 	void	joinCommand(std::string channelName, Client &client);
-	void	eventClient(Client *Client);
+	void	eventClient(Client *Client); //val
 	void	removeClient(int fd);
 	Client 	*getClientbyFd(int fd);
-	int		checkNameValidity( std::string &name )
+	int		checkNameValidity( std::string &name );
 };
 
