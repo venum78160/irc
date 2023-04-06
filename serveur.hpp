@@ -31,7 +31,7 @@ public:
     void	start();
 	void	run();
 	void	eventClient( pollfd Client);
-	void	getServerChannels();
+	std::vector<Channel*>	getServerChannels();
 	void	handleMessage(std::string message, int fd);
 	void	handleFirstConnection(int clientSocket);
 	void	joinCommand(std::string channelName, Client &client);
