@@ -17,18 +17,18 @@ Serveur::Serveur(std::string password, char *port) : _password(password)
 
 Serveur::~Serveur()
 {
-    //delete all clients if remains
-    for (int i = 0; i < _clients.size(); i++)
+    //delete all clients map if remains
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
     {
-        delete _clients[i];
+        delete it->second;
     }
-    for (int i = 0; i < _channels.size(); i++)
+    for (size_t i = 0; i < _channels.size(); i++)
     {
         delete _channels[i];
     }
 }
 
-void Serveur::getServerChannels()
+std::vector<Channel *> Serveur::getServerChannels()
 {
     return (_channels);
 }
@@ -62,16 +62,17 @@ void Serveur::handleFirstConnection(int clientSocket)
             {
                 std::string reply = ":127.0.0.1 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + username + "@HOST";
                 send(clientSocket, reply.c_str(), reply.size(), 0);
-                if (std::find(_clients.begin(), _clients.end(), username) == _clients.end())
+                for std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
                 {
-                    Client *client = new Client(clientSocket, nickname, username, "", "invisible");
-                    _clients.push_back(client);
+                    if (it->second->getNickname() == nickname)
+                    {
+                        Client *client = new Client(clientSocket, nickname, username, "", "invisible");
+                        _clients[clientSocket] = client;
+                        return ;
+                    }
                 }
-                else
-                {
-                    std::string reply = ":127.0.0.1 433 " + nickname + " :Nickname is already in use";
-                    send(clientSocket, reply.c_str(), reply.size(), 0);
-                }
+                std::string reply = ":127.0.0.1 433 " + nickname + " :Nickname is already in use";
+                send(clientSocket, reply.c_str(), reply.size(), 0);
             }
             else
             {
@@ -112,7 +113,7 @@ void Serveur::joinCommand(std::string channelName, Client &client)
 {
     if (channelName[0] != '#')
     {
-        std::reply = ":127.0.0.1 461 " + client.GetNickname() + " :Not enough parameters";
+        std::string reply = ":127.0.0.1 461 " + client.GetNickname() + " :Not enough parameters";
         send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
     }
     if (channelName == "0")

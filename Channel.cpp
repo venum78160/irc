@@ -42,7 +42,7 @@ void Channel::setUserLimit( unsigned int limit )
 
 bool	Channel::checkNameValidity( std::string &name )
 {
-	unsigned int	nameLen = name.size();
+	int	nameLen = name.size();
 	if (nameLen > 50 || nameLen < 2)
 		return (false);
 	if (name[0] != '&')
