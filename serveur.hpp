@@ -7,9 +7,10 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include <vector>
-#include "client.hpp"
 #include <fcntl.h>
 #include <cstdlib>
+#include "client.hpp"
+#include "channel.hpp"
 
 #define MAX_CLIENTS 10
 #define BUFFER_SIZE 512 // Taille du buffer de réception
@@ -22,11 +23,18 @@ private:
     struct sockaddr_in  _serverAddr;
     std::string         _password;
 	std::vector<pollfd> _pollFds;
+	std::vector <Client *> _clients;
+	std::vector <Channel *> _channels;
 public:
     Serveur(std::string password, char *port);
     ~Serveur();
     void	start();
 	void	run();
 	void	eventClient( pollfd Client);
+	void	getServerChannels();
+	void	handleMessage(std::string message, int fd);
+	void	handleFirstConnection(int clientSocket);
+	void	joinCommand(std::string channelName, Client &client);
+	Client 	*getClientbyFd(int fd);
 };
 
