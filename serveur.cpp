@@ -144,8 +144,8 @@ void Serveur::joinCommand(std::string channelName, Client &client)
         }
         // reply sucessfully joined
         std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName;
+        client.SetServername(channelName);
     }
-
 }
 
 void    Serveur::handleMessage(std::string message, int fd)
