@@ -14,10 +14,12 @@
 class Client {
 public:
     Client(int sock_fd, const std::string& nickname, const std::string& username, const std::string& servername, const std::string& mode);
+	Client& operator=(const Client& other);
     ~Client();
 
     // Accesseurs
     int GetSocketFD() const;
+	char	*GetBuffer();
     std::string GetNickname() const;
     std::string GetUsername() const;
     std::string GetServername() const;
@@ -33,6 +35,7 @@ public:
     void RemoveChannel(const std::string& channel);
 
 private:
+	std::vector<char> buffer_;
     int sock_fd_;
     std::string nickname_;
     std::string username_;

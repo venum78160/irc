@@ -3,12 +3,32 @@
 #include "client.hpp"
 
 Client::Client(int sock_fd, const std::string& nickname, const std::string& username, const std::string& servername, const std::string& mode)
-    : sock_fd_(sock_fd), nickname_(nickname), username_(username), servername_(servername), mode_(mode) {}
+    : sock_fd_(sock_fd), nickname_(nickname), username_(username), servername_(servername), mode_(mode) 
+	{
+		buffer_.resize(BUFFER_SIZE);
+	}
+
+Client& Client::operator=(const Client& other)
+{
+    if (this != &other) {
+        sock_fd_ = other.sock_fd_;
+        nickname_ = other.nickname_;
+        username_ = other.username_;
+        servername_ = other.servername_;
+        mode_ = other.mode_;
+    }
+    return *this;
+}
 
 Client::~Client() {}
 
 int Client::GetSocketFD() const {
     return sock_fd_;
+}
+
+char* Client::GetBuffer()
+{
+    return buffer_.data();
 }
 
 std::string Client::GetNickname() const {

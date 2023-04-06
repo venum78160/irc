@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <poll.h>
 #include <vector>
+#include <map>
 #include "client.hpp"
 
 #define MAX_CLIENTS 10
@@ -15,17 +16,19 @@
 class Serveur
 {
 private:
-    int                 _serverSocket;
-    int			        _port;
-    struct sockaddr_in  _serverAddr;
-    std::string         _password;
-	std::vector<pollfd> _pollFds;
+    int                 	_serverSocket;
+    int			        	_port;
+    struct sockaddr_in  	_serverAddr;
+    std::string         	_password;
+	std::vector<pollfd> 	_pollFds;
+	std::map<int , Client>	_MClient;
 public:
     Serveur(std::string password, char *port);
     ~Serveur();
     void	start();
 	void	run();
-	void	eventClient( pollfd Client);
+	void	eventClient(Client *Client);
+	void	removeClient(int fd);
 };
 
 Serveur::Serveur(std::string password, char *port) : _password(password)
@@ -46,14 +49,28 @@ Serveur::~Serveur()
 {
 }
 
-void	eventClient( pollfd Client)
+void Serveur::removeClient(int fd) {
+    std::vector<pollfd>::iterator it = _pollFds.begin();
+    while (it != _pollFds.end()) {
+        if (it->fd == fd) {
+            close(fd); // fermer le descripteur de fichier
+            _pollFds.erase(it); // supprimer le pollfd de la liste
+            _MClient.erase(fd); // supprimer le client de la map
+            break;
+        }
+        ++it;
+    }
+}
+
+
+void	Serveur::eventClient(Client *Client)
 {
 	char	buffer[BUFFER_SIZE];
-	int bytes_read = recv(Client.fd, buffer, sizeof(buffer), 0);
+	int bytes_read = recv(Client->GetSocketFD(), Client->GetBuffer(), sizeof(BUFFER_SIZE), 0);
 	if (bytes_read <= 0)
 	{
-        // Le client s'est déconnecté, supprimer son descripteur de fichier
-        close(Client.fd);
+        // Le client s'est déconnecté, supprimer de partout
+		removeClient(Client->GetSocketFD());
 	}
 }
 
@@ -87,6 +104,8 @@ void	Serveur::run()
                 // Ajout du descripteur de fichier du client à la structure pollfd
                 pollfd clientPollFd = {clientSocket, POLLIN, 0};
                 _pollFds.push_back(clientPollFd);
+				// Ajout du client avec comme pair son fd à la map.
+				_MClient.insert(std::make_pair(clientSocket, Client(clientSocket, "val", "venum", "servername", "here")));
 
                 std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
             }
@@ -94,7 +113,9 @@ void	Serveur::run()
             // Vérification si un événement s'est produit sur l'un des sockets des clients
             else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLIN)
             {
-              eventClient(_pollFds[i]);
+				int fd_client = _pollFds[i].fd;
+				// Client* client = &_MClient[fd_client];
+				eventClient(&_MClient[fd_client]);
             }
         }
 	}
