@@ -22,3 +22,9 @@
 #define MAX_CLIENTS 10
 #define BUFFER_SIZE 512 // Taille du buffer de réception
 
+// ERROR CODES
+#define NAMETOOLONG 0
+#define NOTENOUGHPARAMS 1
+#define WRONGNAME 2
+#define CHANNELALREADYEXISTS 3
+#define VALIDNAME 4

@@ -10,7 +10,6 @@
 // mode_ : une chaîne de caractères qui contient le mode du client (par exemple, s'il est en mode "invisible", "away", etc.).
 // channels_ : un vecteur de chaînes de caractères qui contient les noms des canaux auxquels le client est actuellement connecté.
 
-
 class Client {
 public:
     Client(int sock_fd, const std::string& nickname, const std::string& username, const std::string& servername, const std::string& mode);
