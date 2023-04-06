@@ -23,7 +23,7 @@ private:
     struct sockaddr_in  _serverAddr;
     std::string         _password;
 	std::vector<pollfd> _pollFds;
-	std::vector <Client *> _clients;
+	std::map <int, Client *> _clients;
 	std::vector <Channel *> _channels;
 public:
     Serveur(std::string password, char *port);
@@ -35,6 +35,5 @@ public:
 	void	handleMessage(std::string message, int fd);
 	void	handleFirstConnection(int clientSocket);
 	void	joinCommand(std::string channelName, Client &client);
-	Client 	*getClientbyFd(int fd);
 };
 
