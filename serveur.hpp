@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <cstdlib>
 #include "client.hpp"
-#include "channel.hpp"
+#include "Channel.hpp"
 
 #define MAX_CLIENTS 10
 #define BUFFER_SIZE 512 // Taille du buffer de réception
@@ -23,7 +23,7 @@ private:
     struct sockaddr_in  _serverAddr;
     std::string         _password;
 	std::vector<pollfd> _pollFds;
-	std::vector <Client *> _clients;
+	std::map <int, Client *> _clients;
 	std::vector <Channel *> _channels;
 public:
     Serveur(std::string password, char *port);
