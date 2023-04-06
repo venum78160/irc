@@ -1,7 +1,5 @@
 #include "ft_irc.hpp"
 
-#include "client.hpp"
-
 Client::Client(int sock_fd, const std::string& nickname, const std::string& username, const std::string& servername, const std::string& mode)
     : sock_fd_(sock_fd), nickname_(nickname), username_(username), servername_(servername), mode_(mode) 
 	{
