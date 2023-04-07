@@ -42,3 +42,5 @@ private:
     std::string mode_;
     std::vector<std::string> channels_;
 };
+
+std::ostream &operator<<(std::ostream &out, const Client &client);

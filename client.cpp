@@ -77,3 +77,9 @@ void Client::RemoveChannel(const std::string& channel) {
         }
     }
 }
+
+std::ostream &operator<<(std::ostream &out, const Client &client)
+{
+    out << client.GetNickname();
+    return out;
+}

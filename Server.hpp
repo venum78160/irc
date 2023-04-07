@@ -33,6 +33,9 @@ public:
 	int		checkNameValidity( std::string &name );
 	void	handleRequestError( int error, Client &user ) const;
 
+
+	// Commands
 	void	joinCommand(std::string channelName, Client &client);
+	
 };
 

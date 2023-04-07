@@ -9,10 +9,12 @@ class	Channel
 
 private:
 	std::string					_name; // name of the channel
-	std::map<Client *, bool> 	_users; // list of users, coupled with a boolean that is true if user is an operator
-	int							_maxUsers;
+	std::map<Client *, bool> 	_users; // list of users, coupled with a boolean that is true if user is an operator on this channel
+	std::vector<std::string>	_userNicks; // list of users by their nicknames, useful for NAMES command
+	int							_maxUsers; // equals -1 if no limit is set
 	std::string					_topic;
-	Channel( void );
+
+	Channel( void ); // class must be initialized with a name and a creator, no default constructor
 
 public:
 	Channel( std::string name, Client *creator );
@@ -21,8 +23,8 @@ public:
 	// Accessors
 	std::string 	getName( void ) const;
 	// void			rename( std::string name );
-	unsigned int	getUserLimit( void ) const;
-	void			setUserLimit( unsigned int limit );
+	int				getUserLimit( void ) const;
+	void			setUserLimit( int limit );
 	std::string		getTopic( void ) const;
 	void			setTopic( std::string topic );
 
