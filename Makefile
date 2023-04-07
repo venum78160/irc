@@ -1,7 +1,7 @@
 NAME = ircserv
 CC = c++
 FLAGS = -Wall -Werror -Wextra -std=c++98
-SRCS = main.cpp client.cpp serveur.cpp Channel.cpp
+SRCS = main.cpp client.cpp Server.cpp Channel.cpp
 
 all: $(NAME)
 
