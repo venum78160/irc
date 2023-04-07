@@ -10,7 +10,7 @@ class	Channel
 private:
 	std::string					_name; // name of the channel
 	std::map<Client *, bool> 	_users; // list of users, coupled with a boolean that is true if user is an operator
-	unsigned int				_maxUsers;
+	int							_maxUsers;
 	std::string					_topic;
 	Channel( void );
 
@@ -23,6 +23,8 @@ public:
 	// void			rename( std::string name );
 	unsigned int	getUserLimit( void ) const;
 	void			setUserLimit( unsigned int limit );
+	std::string		getTopic( void ) const;
+	void			setTopic( std::string topic );
 
 	bool	checkNameValidity( std::string &name ); // checks if channel name is valid. should later be included in Server class as well
 
@@ -34,9 +36,6 @@ public:
 
 	void	giveOpRights( Client *user );
 	void	removeOpRights( Client *user );
-
-	void		setTopic( std::string topic );
-	std::string	getTopic( void ) const;
 
 	class	channelException : public std::exception
 	{

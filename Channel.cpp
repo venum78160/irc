@@ -18,6 +18,7 @@ Channel::Channel( std::string name, Client *creator ) : _name(name)
 {
 	std::pair<Client *, bool> newUser(creator, true);
 	(this->_users).insert(newUser);
+	this->_maxUsers = -1;
 }
 
 std::string Channel::getName( void ) const
@@ -30,13 +31,17 @@ std::string Channel::getName( void ) const
 // 	this->_name = name;
 // }
 
-unsigned int Channel::getUserLimit( void ) const
+int Channel::getUserLimit( void ) const
 {
+	if (this->_maxUsers == -1)
+		throw (channelException("No user limit set"));
 	return (this->_maxUsers);
 }
 
-void Channel::setUserLimit( unsigned int limit )
+void Channel::setUserLimit( int limit )
 {
+	if (limit < -1)
+		throw (channelException("Invalid user limit"));
 	this->_maxUsers = limit;
 }
 
@@ -45,7 +50,7 @@ bool	Channel::checkNameValidity( std::string &name )
 	int	nameLen = name.size();
 	if (nameLen > 50 || nameLen < 2)
 		return (false);
-	if (name[0] != '&')
+	if (name[0] != '#')
 		return (false);
 
 	for (int i = 0; i < nameLen; i++)
@@ -102,5 +107,25 @@ void Channel::giveOpRights( Client *user )
 	std::map<Client *, bool>::iterator it;
 	it = (this->_users).find(user);
 
-	it->second = true;
+	if (it != (this->_users).end())
+		it->second = true;
+}
+
+void Channel::removeOpRights( Client *user )
+{
+	std::map<Client *, bool>::iterator it;
+	it = (this->_users).find(user);
+
+	if (it != (this->_users).end())
+		it->second = false;
+}
+
+void Channel::setTopic( std::string topic )
+{
+	this->_topic = topic;
+}
+
+std::string	Channel::getTopic( void ) const
+{
+	return (this->_topic);
 }
