@@ -87,10 +87,9 @@ void	Server::run()
                 pollfd clientPollFd = {clientSocket, POLLIN, 0};
                 _pollFds.push_back(clientPollFd);
 				// Ajout du client avec comme pair son fd à la map.
+                std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
 				handleFirstConnection(clientSocket);
 				//_MClient.insert(std::make_pair(clientSocket, Client(clientSocket, "val", "venum", "servername", "here"))); // a voir avec ange
-
-                std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
             }
 
             // Vérification si un événement s'est produit sur l'un des sockets des clients
@@ -99,10 +98,6 @@ void	Server::run()
 				int fd_client = _pollFds[i].fd;
 				// Client* client = &_MClient[fd_client];
 				eventClient(&_MClient[fd_client]);
-            }
-			if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLHUP)
-            {
-                removeClient(_pollFds[i].fd);
             }
         }
 	}
@@ -170,6 +165,7 @@ void Server::handleFirstConnection(int clientSocket)
     std::string username;
     memset(buffer, 0, BUFFER_SIZE);
     int bytes_read = recv(clientSocket, buffer, sizeof(buffer), 0);
+    std::cout << "bytes_read : " << bytes_read << std::endl;
     if (bytes_read <= 0)
     {
         // Le client s'est déconnecté, supprimer son descripteur de fichier
@@ -183,9 +179,12 @@ void Server::handleFirstConnection(int clientSocket)
         std::cout << "Message reçu : " << message << std::endl;
         if (message.find("NICK") != std::string::npos && message.find("PASS") != std::string::npos && message.find("USER") != std::string::npos)
         {
-            nickname = message.substr(message.find("NICK") + 5, message.find("PASS") - 1);
-            password = message.substr(message.find("PASS") + 5, message.find("USER") - 1);
-            username = message.substr(message.find("USER") + 5, message.find("HOST") - 1);
+            std::string::size_type pass_pos = message.find("PASS ");
+            std::string::size_type nick_pos = message.find("NICK ");
+            std::string::size_type user_pos = message.find("USER ");
+            std::string password = message.substr(pass_pos + 5, nick_pos - pass_pos - 6);
+            std::string nickname = message.substr(nick_pos + 5, user_pos - nick_pos - 6);
+            std::string username = message.substr(user_pos + 5, message.size() - user_pos - 6);
             if (password == _password)
             {
                 std::string reply = ":127.0.0.1 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + username + "@HOST";
@@ -205,6 +204,7 @@ void Server::handleFirstConnection(int clientSocket)
                 _MClient[clientSocket].SetUsername(username);
                 _MClient[clientSocket].SetServername("");
                 _MClient[clientSocket].SetMode("online");
+                std::cout << "Client " << nickname << " connected" << std::endl;
             }
             else
             {
@@ -269,7 +269,14 @@ void Server::joinCommand(std::string channelName, Client &client)
         for (size_t i = 0; i < client.GetChannels().size(); i++)
         {
             client.RemoveChannel(client.GetChannels()[i]);
-			// enlever aussi le client dans la classe channel TODO
+            for (size_t j = 0; j < _channels.size(); j++)
+            {
+                if (_channels[j].getName() == client.GetChannels()[i])
+                {
+                    _channels[j].removeUser(client);
+                    break ;
+                }
+            }
         }
         std::string reply = ": " + client.GetNickname() + " JOIN 0";
 		send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);

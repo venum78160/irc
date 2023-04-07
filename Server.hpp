@@ -23,8 +23,7 @@ public:
     void	start();
 	void	run();
 
-	void	eventClient( pollfd Client); // Ange
-	void	eventClient(Client *Client); //val
+	void	eventClient(Client *Client);
 
 	std::vector<Channel>	getServerChannels();
 	Client 					getClientbyFd(int fd);
