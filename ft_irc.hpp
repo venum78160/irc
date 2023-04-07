@@ -18,7 +18,7 @@
 #include <sstream>
 
 #include "client.hpp"
-#include "serveur.hpp"
+#include "Server.hpp"
 #include "Channel.hpp"
 
 #define MAX_CLIENTS 10
