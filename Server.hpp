@@ -1,6 +1,9 @@
 #pragma once
 #include "ft_irc.hpp"
 
+class Channel;
+class Client;
+
 class Server
 {
 private:
@@ -9,8 +12,8 @@ private:
     struct sockaddr_in		  	_serverAddr;
     std::string         		_password;
 	std::vector<pollfd> 		_pollFds;
-	std::vector <Channel *> 	_channels;
-	std::map <int, Client *> 	_clients;
+	std::vector <Channel> 	_channels;
+	//std::map <int, Client *> 	_clients;
 	std::map<int , Client>		_MClient;
 
 public:
@@ -23,10 +26,10 @@ public:
 	void	eventClient( pollfd Client); // Ange
 	void	eventClient(Client *Client); //val
 
-	std::vector<Channel*>	getServerChannels();
-	Client 					*getClientbyFd(int fd);
+	std::vector<Channel>	getServerChannels();
+	Client 					getClientbyFd(int fd);
 
-	void	handleMessage(std::string message, int fd);
+	void	handleMessage(std::string message, Client &client);
 	void	handleFirstConnection(int clientSocket);
 	void	removeClient(int fd);
 

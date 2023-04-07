@@ -1,5 +1,10 @@
 #include "ft_irc.hpp"
 
+Client::Client()
+{
+    buffer_.resize(BUFFER_SIZE);
+}
+
 Client::Client(int sock_fd, const std::string& nickname, const std::string& username, const std::string& servername, const std::string& mode)
     : sock_fd_(sock_fd), nickname_(nickname), username_(username), servername_(servername), mode_(mode) 
 	{
@@ -16,6 +21,16 @@ Client& Client::operator=(const Client& other)
         mode_ = other.mode_;
     }
     return *this;
+}
+
+bool Client::operator==(const Client& other) const
+{
+    return sock_fd_ == other.sock_fd_;
+}
+
+bool Client::operator<(const Client& other) const
+{
+    return sock_fd_ < other.sock_fd_;
 }
 
 Client::~Client() {}

@@ -1,10 +1,11 @@
 
 #include "ft_irc.hpp"
 
-Server::Server(std::string password, char *port) : _password(password)
-{
-	try // plutôt try et catch dans le main avant d'envoyer port au constructeur
-        _port = std::atoi(port);
+Server::Server(std::string password, char *port) : _password(password) {
+    try // plutôt try et catch dans le main avant d'envoyer port au constructeur
+    {
+    _port = std::atoi(port);
+    }
     catch (const std::invalid_argument& e)
     {
         std::cerr << "Erreur : la chaîne n'est pas un entier valide." << std::endl;
@@ -50,7 +51,7 @@ void	Server::eventClient(Client *Client)
         // Traiter le message reçu
         std::string message(Client->GetBuffer());
         std::cout << "Message reçu : " << message << std::endl;
-        Server::handleMessage(message, Client->GetSocketFD());
+        this->handleMessage(message, *Client);
     }
 }
 
@@ -67,7 +68,7 @@ void	Server::run()
         }
 
         // Parcours de la structure pollfd pour traiter les événements
-        for (int i = 0; i < _pollFds.size(); i++)
+        for (size_t i = 0; i < _pollFds.size(); i++)
         {
             // Vérification si un événement s'est produit sur le socket d'écoute
             if (_pollFds[i].fd == _serverSocket && _pollFds[i].revents & POLLIN)
@@ -87,7 +88,7 @@ void	Server::run()
                 _pollFds.push_back(clientPollFd);
 				// Ajout du client avec comme pair son fd à la map.
 				handleFirstConnection(clientSocket);
-				_MClient.insert(std::make_pair(clientSocket, Client(clientSocket, "val", "venum", "servername", "here"))); // a voir avec ange
+				//_MClient.insert(std::make_pair(clientSocket, Client(clientSocket, "val", "venum", "servername", "here"))); // a voir avec ange
 
                 std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
             }
@@ -155,7 +156,7 @@ void	Server::start()
 //     }
 // }
 
-std::vector<Channel *> Server::getServerChannels()
+std::vector<Channel> Server::getServerChannels()
 {
     return (_channels);
 }
@@ -189,17 +190,21 @@ void Server::handleFirstConnection(int clientSocket)
             {
                 std::string reply = ":127.0.0.1 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + username + "@HOST";
                 send(clientSocket, reply.c_str(), reply.size(), 0);
-                for (std::map<int, Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
+                for (std::map<int, Client>::iterator it = _MClient.begin(); it != _MClient.end(); ++it)
                 {
-                    if (it->second->getNickname() == nickname)
+                    if (it->second.GetNickname() == nickname)
                     {
-                        Client *client = new Client(clientSocket, nickname, username, "", "invisible");  // a voir avec ange Pour moi inversion des cas de la ligne 214 et 219
-                        _clients[clientSocket] = client;
+                        std::string reply = ":127.0.0.1 433 " + nickname + " :Nickname is already in use";
+                        send(clientSocket, reply.c_str(), reply.size(), 0);
                         return ;
                     }
                 }
-                std::string reply = ":127.0.0.1 433 " + nickname + " :Nickname is already in use";
-                send(clientSocket, reply.c_str(), reply.size(), 0);
+                //inserer le client dans la map
+                _MClient.insert(std::make_pair(clientSocket, Client()));
+                _MClient[clientSocket].SetNickname(nickname);
+                _MClient[clientSocket].SetUsername(username);
+                _MClient[clientSocket].SetServername("");
+                _MClient[clientSocket].SetMode("online");
             }
             else
             {
@@ -220,21 +225,23 @@ void Server::handleRequestError( int error, Client &user ) const
 	std::string reply;
 
 	if (error == NOTENOUGHPARAMS)
-		reply = ":127.0.0.1 461 " + client.GetNickname() + " :Not enough parameters";
+		reply = ":127.0.0.1 461 " + user.GetNickname() + " :Not enough parameters";
 	else if (error == NAMETOOLONG)
-		reply = ":127.0.0.1 479 " + client.GetNickname() + " :Channel name too long";
+		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name too long";
 	else if (error == WRONGNAME)
-		reply = ":127.0.0.1 479 " + client.GetNickname() + " :Channel name contains illegal characters";
+		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name contains illegal characters";
 
-	send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+	send(user.GetSocketFD(), reply.c_str(), reply.size(), 0);
 }
 
 int Server::checkNameValidity( std::string &name )
 {
-	unsigned int	nameLen = name.size();
-
-	if (this->_channels.find(name) != this->_channels.end())
-		return (CHANNELALREADYEXISTS);
+	int	nameLen = name.size();
+    for (size_t i = 0; i < _channels.size(); i++)
+    {
+        if (_channels[i].getName() == name)
+            return (CHANNELALREADYEXISTS);
+    }
 	if (nameLen > 50)
 		return (NAMETOOLONG);
 	if (name[0] != '#')
@@ -251,7 +258,7 @@ void Server::joinCommand(std::string channelName, Client &client)
 {
 	std::transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
     int	token = checkNameValidity(channelName);
-    if (token == NOTENOUGHPARAMS || NAMETOOLONG || WRONGNAME)
+    if (token == NOTENOUGHPARAMS || token == NAMETOOLONG || token == WRONGNAME)
     {
 		handleRequestError(token, client);
 		return ;
@@ -259,59 +266,55 @@ void Server::joinCommand(std::string channelName, Client &client)
     if (channelName == "0")
     {
         // JOIN 0 means leave all channels
-        for (int i = 0; i < client.GetChannels().size(); i++)
+        for (size_t i = 0; i < client.GetChannels().size(); i++)
         {
             client.RemoveChannel(client.GetChannels()[i]);
-			// enlever aussi le client dans la classe channel
+			// enlever aussi le client dans la classe channel TODO
         }
         std::string reply = ": " + client.GetNickname() + " JOIN 0";
-		// ajouter le send non ?
+		send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
         return ;
     }
-    if (std::find(_channels.begin(), _channels.end(), channelName) == _channels.end()) // channel doesn't exist
+    //check if channel already exist
+    for (size_t i = 0; i < _channels.size(); i++)
     {
-        Channel *newChannel = new Channel(channelName, client);
-        try
-            newChannel->addUser(client);
-        catch (const std::exception &e)
+        // channel already exists
+        if (_channels[i].getName() == channelName)
         {
-            std::cerr << client.GetNickname() << " : " << e.what() << std::endl;
-            // make reply for full channels
-            std::string reply = ":127.0.0.1 471 " + client.getNickname() + " :Cannot join channel (+l)";
+            Channel newChannel = _channels[i];
+            try
+            {
+                newChannel.addUser(client);
+            }
+            catch (const std::exception &e)
+            {
+                std::cerr << client.GetNickname() << " : " << e.what() << std::endl;
+                // make reply for full channels
+                std::string reply = ":127.0.0.1 471 " + client.GetNickname() + " :Cannot join channel (+l)";
+                return;
+            }
+            // reply sucessfully joined
+            std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName;
+            send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+            client.SetServername(channelName);
             return ;
         }
-        _channels.push_back(newChannel);
     }
-    else // channel already exists
-    {
-        for (int i = 0; i < _channels.size(); i++)
-        {
-            if (_channels[i]->GetName() == channelName)
-            {
-                newChannel = _channels[i];
-                break;
-            }
-        }
-        try
-            newChannel->addUser(client);
-        catch (const std::exception &e) {
-            std::cerr << client.GetNickname() << " : " << e.what() << std::endl;
-            // make reply for full channels
-            std::string reply = ":127.0.0.1 471 " + client.GetNickname() + " :Cannot join channel (+l)";
-            return;
-        }
-        // reply sucessfully joined
-        std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName;
-        client.SetServername(channelName);
-    }
+    // channel doesn't exist
+    Channel newChannel(channelName, client);
+    newChannel.addUser(client); // pas besoin de try le channel vient d'être créé il ne peut pas être full
+      _channels.push_back(newChannel);
+    // reply sucessfully joined
+    std::string reply = ": " + client.GetNickname() + " JOIN " + channelName;
+    client.SetServername(channelName);
+    send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 }
 
-void    Server::handleMessage(std::string message, int fd)
+void    Server::handleMessage(std::string message, Client &client)
 {
-    Client *client = getClientbyFd(fd);
     if (message.find("JOIN") != std::string::npos)
     {
         std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
-        joinCommand(channelName, *client);
+        this->joinCommand(channelName, client);
     }
 }

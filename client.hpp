@@ -12,9 +12,12 @@
 
 class Client {
 public:
+    Client();
     Client(int sock_fd, const std::string& nickname, const std::string& username, const std::string& servername, const std::string& mode);
 	Client& operator=(const Client& other);
     ~Client();
+    bool operator<(const Client& other) const;
+    bool operator==(const Client& other) const;
 
     // Accesseurs
     int GetSocketFD() const;

@@ -16,10 +16,12 @@
 #include <vector>
 #include <map>
 #include <sstream>
+#include <cstring>
+#include <algorithm>
 
 #include "client.hpp"
-#include "Server.hpp"
 #include "Channel.hpp"
+#include "Server.hpp"
 
 #define MAX_CLIENTS 10
 #define BUFFER_SIZE 512 // Taille du buffer de réception
