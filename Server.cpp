@@ -61,12 +61,12 @@ void	Server::run()
 	while (true)
 	{
         // Attente d'un événement sur l'un des descripteurs de fichiers surveillés
-        if (poll(&_pollFds[0], _pollFds.size(), -1) < 0)
+        int pollResult = poll(_pollFds.data(), _pollFds.size(), -1);
+        if (pollResult < 0)
 		{
             std::cerr << "Erreur lors de l'appel à la fonction poll()" << std::endl;
             break;
         }
-
         // Parcours de la structure pollfd pour traiter les événements
         for (size_t i = 0; i < _pollFds.size(); i++)
         {
@@ -84,7 +84,7 @@ void	Server::run()
                 }
 
                 // Ajout du descripteur de fichier du client à la structure pollfd
-                pollfd clientPollFd = {clientSocket, POLLIN, 0};
+                pollfd clientPollFd = {clientSocket, POLLIN | POLLOUT | POLLHUP, 0};
                 _pollFds.push_back(clientPollFd);
 				// Ajout du client avec comme pair son fd à la map.
                 std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
@@ -98,6 +98,11 @@ void	Server::run()
 				int fd_client = _pollFds[i].fd;
 				// Client* client = &_MClient[fd_client];
 				eventClient(&_MClient[fd_client]);
+            }
+            else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLHUP)
+            {
+                std::cout << "Déconnexion du client" << std::endl;
+                removeClient(_pollFds[i].fd);
             }
         }
 	}
@@ -204,7 +209,6 @@ void Server::handleFirstConnection(int clientSocket)
                 _MClient[clientSocket].SetUsername(username);
                 _MClient[clientSocket].SetServername("");
                 _MClient[clientSocket].SetMode("online");
-                std::cout << "Client " << nickname << " connected" << std::endl;
             }
             else
             {
@@ -319,6 +323,8 @@ void Server::joinCommand(std::string channelName, Client &client)
 
 void    Server::handleMessage(std::string message, Client &client)
 {
+    std::cout << "Message : " << message << std::endl;
+    std::cout << "Client : " << client << std::endl;
     if (message.find("JOIN") != std::string::npos)
     {
         std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
