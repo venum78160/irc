@@ -344,9 +344,35 @@ void Server::joinCommand(std::string channelName, Client &client)
 void Server::partCommand(std::string channelName, Client &client)
 {
 	// Commande : PART #channel ou /part #channel
-	// Mettre en minuscule le nom du channel car il est insensible à la casse
-	// Checker si le channel existe -> si oui, le supprimer de la liste des channels du client, si non, envoyer un message d'erreur
-	// Supprimer le client de la liste des clients du channel
+	// 1 - Mettre en minuscule le nom du channel car il est insensible à la casse
+	// 2 - Checker si le channel existe -> si oui, le supprimer de la liste des channels du client, si non, envoyer un message d'erreur
+	// 3 - Supprimer le client de la liste des clients du channel
 
+	// 1
 	std::transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
+
+	// 2
+	Channel *channelToLeave;
+
+	std::vector<Channel *>::iterator it = std::find_if(_channels.begin(), _channels.end(), [&channelName](Channel *channel) { return channel->getName() == channelName; });
+	if (it == _channels.end())
+	{
+		// send error message
+		return ;
+	}
+	else
+		channelToLeave = *it;
+
+	std::vector<std::string> clientChannels = client.GetChannels();
+	for (size_t i = 0; i < clientChannels.size(); i++)
+	{
+		if (clientChannels[i] == channelName)
+		{
+			client.RemoveChannel(channelName);
+			break ;
+		}
+	}
+
+	// 3
+	channelToLeave->removeUser(client);
 }

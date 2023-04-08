@@ -12,7 +12,7 @@ private:
     struct sockaddr_in		  	_serverAddr;
     std::string         		_password;
 	std::vector<pollfd> 		_pollFds;
-	std::vector <Channel> 	_channels;
+	std::vector<Channel *> 		_channels;
 	//std::map <int, Client *> 	_clients;
 	std::map<int , Client>		_MClient;
 
@@ -25,7 +25,7 @@ public:
 
 	void	eventClient(Client *Client);
 
-	std::vector<Channel>	getServerChannels();
+	std::vector<Channel *>	getServerChannels();
 	Client 					getClientbyFd(int fd);
 
 	void	handleMessage(std::string message, Client &client);
