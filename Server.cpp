@@ -8,8 +8,8 @@ Server::~Server() { }
 
 void Server::removeClient(int fd)
 {
-    std::vector<pollfd>::iterator it = _pollFds.begin();
-    std::vector<pollfd>::iterator ite = _pollFds.end();
+	std::vector<pollfd>::iterator it = _pollFds.begin();
+	std::vector<pollfd>::iterator ite = _pollFds.end();
 
     while (it != ite)
     {
@@ -39,7 +39,7 @@ void	Server::eventClient(Client *Client)
 	// int bytes_read = recv(Client->GetSocketFD(), Client->GetBuffer(), sizeof(BUFFER_SIZE), 0);
 	if (bytes_read <= 0)
 	{
-        // Le client s'est déconnecté, supprimer de partout
+		// Le client s'est déconnecté, supprimer de partout
 		removeClient(Client->GetSocketFD());
 	}
 	else
@@ -60,9 +60,15 @@ void	Server::run()
 	fcntl(_serverSocket, F_SETFL, O_NONBLOCK); // Set the socket to non-blocking
 	while (true)
 	{
-        // Attente d'un événement sur l'un des descripteurs de fichiers surveillés
-        int pollResult = poll(_pollFds.data(), _pollFds.size(), -1);
-        if (pollResult < 0)
+		// Attente d'un événement sur l'un des descripteurs de fichiers surveillés
+		int pollResult = poll(_pollFds.data(), _pollFds.size(), -1);
+		if (pollResult < 0)
+		{
+			std::cerr << "Erreur lors de l'appel à la fonction poll()" << std::endl;
+			break;
+		}
+		// Parcours de la structure pollfd pour traiter les événements
+		for (size_t i = 0; i < _pollFds.size(); i++)
 		{
             std::cerr << "Erreur lors de l'appel à la fonction poll()" << std::endl;
             break;
@@ -84,29 +90,29 @@ void	Server::run()
                     break;
                 }
 
-                // Ajout du descripteur de fichier du client à la structure pollfd
-                pollfd clientPollFd = {clientSocket, POLLIN | POLLOUT | POLLHUP, 0};
-                _pollFds.push_back(clientPollFd);
+				// Ajout du descripteur de fichier du client à la structure pollfd
+				pollfd clientPollFd = {clientSocket, POLLIN | POLLOUT | POLLHUP, 0};
+				_pollFds.push_back(clientPollFd);
 				// Ajout du client avec comme pair son fd à la map.
-                std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
+				std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
 				handleFirstConnection(clientSocket);
 				std::cout << "after handleconnection" << _MClient[clientSocket].GetSocketFD() << "|User =" << _MClient[clientSocket].GetUsername()<< "][" << clientSocket << "] map size = " << _MClient.size() << std::endl;
 				//_MClient.insert(std::make_pair(clientSocket, Client(clientSocket, "val", "venum", "servername", "here"))); // a voir avec ange
-            }
+			}
 
-            // Vérification si un événement s'est produit sur l'un des sockets des clients
-            else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLIN)
-            {
+			// Vérification si un événement s'est produit sur l'un des sockets des clients
+			else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLIN)
+			{
 				int fd_client = _pollFds[i].fd;
 				// Client* client = &_MClient[fd_client];
 				eventClient(&_MClient[fd_client]);
-            }
-            else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLHUP)
-            {
-                std::cout << "Déconnexion du client" << std::endl;
-                removeClient(_pollFds[i].fd);
-            }
-        }
+			}
+			else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLHUP)
+			{
+				std::cout << "Déconnexion du client" << std::endl;
+				removeClient(_pollFds[i].fd);
+			}
+		}
 	}
 }
 
@@ -199,30 +205,30 @@ void	Server::start()
 	// Création du socket d'écoute
 	_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (_serverSocket == -1) {
-        std::cerr << "Erreur lors de la création du socket d'écoute" << std::endl;
-        exit (1);
-    }
+		std::cerr << "Erreur lors de la création du socket d'écoute" << std::endl;
+		exit (1);
+	}
 
 	// Définition des paramètres du socket d'écoute
 	_serverAddr.sin_family = AF_INET;
-    _serverAddr.sin_addr.s_addr = INADDR_ANY;
-    _serverAddr.sin_port = htons(_port);
+	_serverAddr.sin_addr.s_addr = INADDR_ANY;
+	_serverAddr.sin_port = htons(_port);
 
 	// Association du socket d'écoute à l'adresse et au port spécifiés
-    if (bind(_serverSocket, (struct sockaddr *)&_serverAddr, sizeof(_serverAddr)) < 0) {
-        std::cerr << "Erreur lors de l'association du socket d'écoute à l'adresse et au port spécifiés" << std::endl;
-        exit (1);
-    }
+	if (bind(_serverSocket, (struct sockaddr *)&_serverAddr, sizeof(_serverAddr)) < 0) {
+		std::cerr << "Erreur lors de l'association du socket d'écoute à l'adresse et au port spécifiés" << std::endl;
+		exit (1);
+	}
 
-    // Mise en attente de connexions entrantes
-    if (listen(_serverSocket, MAX_CLIENTS) < 0) {
-        std::cerr << "Erreur lors de la mise en attente de connexions entrantes" << std::endl;
-        exit (1);
-    }
+	// Mise en attente de connexions entrantes
+	if (listen(_serverSocket, MAX_CLIENTS) < 0) {
+		std::cerr << "Erreur lors de la mise en attente de connexions entrantes" << std::endl;
+		exit (1);
+	}
 
 	// Création de la structure pollfd pour surveiller les descripteurs de fichiers
-    pollfd serverPollFd = {_serverSocket, POLLIN, 0};
-    _pollFds.push_back(serverPollFd);
+	pollfd serverPollFd = {_serverSocket, POLLIN, 0};
+	_pollFds.push_back(serverPollFd);
 	this->run();
 	close(_serverSocket);
 }
@@ -244,11 +250,11 @@ void Server::handleRequestError( int error, Client &user ) const
 int Server::checkNameValidity( std::string &name )
 {
 	int	nameLen = name.size();
-    for (size_t i = 0; i < _channels.size(); i++)
-    {
-        if (_channels[i].getName() == name)
-            return (CHANNELALREADYEXISTS);
-    }
+	for (size_t i = 0; i < _channels.size(); i++)
+	{
+		if (_channels[i].getName() == name)
+			return (CHANNELALREADYEXISTS);
+	}
 	if (nameLen > 50)
 		return (NAMETOOLONG);
 	if (name[0] != '#')
@@ -261,76 +267,86 @@ int Server::checkNameValidity( std::string &name )
 	return (VALIDNAME);
 }
 
+void	Server::handleMessage(std::string message, Client &client)
+{
+	std::cout << "Message : " << message << std::endl;
+	std::cout << "Client : " << client << std::endl;
+	if (message.find("JOIN") != std::string::npos)
+	{
+		std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
+		this->joinCommand(channelName, client);
+	}
+}
+
 void Server::joinCommand(std::string channelName, Client &client)
 {
 	std::transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
-    int	token = checkNameValidity(channelName);
-    if (token == NOTENOUGHPARAMS || token == NAMETOOLONG || token == WRONGNAME)
-    {
+	int	token = checkNameValidity(channelName);
+	if (token == NOTENOUGHPARAMS || token == NAMETOOLONG || token == WRONGNAME)
+	{
 		handleRequestError(token, client);
 		return ;
-    }
-    if (channelName == "0")
-    {
-        // JOIN 0 means leave all channels
-        for (size_t i = 0; i < client.GetChannels().size(); i++)
-        {
-            client.RemoveChannel(client.GetChannels()[i]);
-            for (size_t j = 0; j < _channels.size(); j++)
-            {
-                if (_channels[j].getName() == client.GetChannels()[i])
-                {
-                    _channels[j].removeUser(client);
-                    break ;
-                }
-            }
-        }
-        std::string reply = ": " + client.GetNickname() + " JOIN 0";
+	}
+	if (channelName == "0")
+	{
+		// JOIN 0 means leave all channels
+		for (size_t i = 0; i < client.GetChannels().size(); i++)
+		{
+			client.RemoveChannel(client.GetChannels()[i]);
+			for (size_t j = 0; j < _channels.size(); j++)
+			{
+				if (_channels[j].getName() == client.GetChannels()[i])
+				{
+					_channels[j].removeUser(client);
+					break ;
+				}
+			}
+		}
+		std::string reply = ": " + client.GetNickname() + " JOIN 0";
 		send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
-        return ;
-    }
-    //check if channel already exist
-    for (size_t i = 0; i < _channels.size(); i++)
-    {
-        // channel already exists
-        if (_channels[i].getName() == channelName)
-        {
-            Channel newChannel = _channels[i];
-            try
-            {
-                newChannel.addUser(client);
-            }
-            catch (const std::exception &e)
-            {
-                std::cerr << client.GetNickname() << " : " << e.what() << std::endl;
-                // make reply for full channels
-                std::string reply = ":127.0.0.1 471 " + client.GetNickname() + " :Cannot join channel (+l)";
-                return;
-            }
-            // reply sucessfully joined
-            std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName;
-            send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
-            client.SetServername(channelName);
-            return ;
-        }
-    }
-    // channel doesn't exist
-    Channel newChannel(channelName, client);
-    newChannel.addUser(client); // pas besoin de try le channel vient d'être créé il ne peut pas être full
-      _channels.push_back(newChannel);
-    // reply sucessfully joined
-    std::string reply = ": " + client.GetNickname() + " JOIN " + channelName;
-    client.SetServername(channelName);
-    send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+		return ;
+	}
+	//check if channel already exist
+	for (size_t i = 0; i < _channels.size(); i++)
+	{
+		// channel already exists
+		if (_channels[i].getName() == channelName)
+		{
+			Channel newChannel = _channels[i];
+			try
+			{
+				newChannel.addUser(client);
+			}
+			catch (const std::exception &e)
+			{
+				std::cerr << client.GetNickname() << " : " << e.what() << std::endl;
+				// make reply for full channels
+				std::string reply = ":127.0.0.1 471 " + client.GetNickname() + " :Cannot join channel (+l)";
+				return;
+			}
+			// reply sucessfully joined
+			std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName;
+			send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+			client.SetServername(channelName);
+			return ;
+		}
+	}
+	// channel doesn't exist
+	Channel newChannel(channelName, client);
+	newChannel.addUser(client); // pas besoin de try le channel vient d'être créé il ne peut pas être full
+	  _channels.push_back(newChannel);
+	// reply sucessfully joined
+	std::string reply = ": " + client.GetNickname() + " JOIN " + channelName;
+	client.SetServername(channelName);
+	send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 }
 
-void    Server::handleMessage(std::string message, Client &client)
+void Server::partCommand(std::string channelName, Client &client)
 {
-    std::cout << "Message : " << message << std::endl;
-    std::cout << "Client : " << client << std::endl;
-    if (message.find("JOIN") != std::string::npos)
-    {
-        std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
-        this->joinCommand(channelName, client);
-    }
+	// Commande : PART #channel ou /part #channel
+	// Mettre en minuscule le nom du channel car il est insensible à la casse
+	// Checker si le channel existe -> si oui, le supprimer de la liste des channels du client, si non, envoyer un message d'erreur
+	// Supprimer le client de la liste des clients du channel
+
+	std::transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
 }
