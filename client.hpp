@@ -29,6 +29,8 @@ public:
     std::vector<std::string> GetChannels() const;
 
     // Mutateurs
+	void SetSock_fd(int fd);
+	void SetBuffer(const std::string& message);
     void SetNickname(const std::string& nickname);
     void SetUsername(const std::string& username);
     void SetServername(const std::string& servername);

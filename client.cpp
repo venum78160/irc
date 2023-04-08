@@ -3,6 +3,7 @@
 Client::Client()
 {
     buffer_.resize(BUFFER_SIZE);
+	// memset(buffer_, 0, BUFFER_SIZE);
 }
 
 Client::Client(int sock_fd, const std::string& nickname, const std::string& username, const std::string& servername, const std::string& mode)
@@ -41,6 +42,7 @@ int Client::GetSocketFD() const {
 
 char* Client::GetBuffer()
 {
+	buffer_.push_back('\0');
     return buffer_.data();
 }
 
@@ -62,6 +64,15 @@ std::string Client::GetMode() const {
 
 std::vector<std::string> Client::GetChannels() const {
     return channels_;
+}
+
+void Client::SetSock_fd(int fd) {
+    sock_fd_ = fd;
+}
+
+void Client::SetBuffer(const std::string& message) {
+    buffer_.resize(message.size());
+    std::copy(message.begin(), message.end(), buffer_.begin());
 }
 
 void Client::SetNickname(const std::string& nickname) {

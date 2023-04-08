@@ -1,21 +1,7 @@
 
 #include "ft_irc.hpp"
 
-Server::Server(std::string password, char *port) : _password(password) {
-    try // plutôt try et catch dans le main avant d'envoyer port au constructeur
-    {
-    _port = std::atoi(port);
-    }
-    catch (const std::invalid_argument& e)
-    {
-        std::cerr << "Erreur : la chaîne n'est pas un entier valide." << std::endl;
-		exit(1);
-    }
-    catch (const std::out_of_range& e)
-    {
-        std::cerr << "Erreur : la chaîne représente un entier en dehors de la plage de valeurs valides." << std::endl;
-		exit(1);
-    }
+Server::Server(std::string password, int port) : _port(port), _password(password) {
 }
 
 Server::~Server() { }
@@ -29,6 +15,7 @@ void Server::removeClient(int fd)
     {
         if (it->fd == fd)
         {
+			std::cout << "[event Client] client : " << fd << " is disconnected" << std::endl;
             close(fd); // fermer le descripteur de fichier
             _pollFds.erase(it); // supprimer le pollfd de la liste
             _MClient.erase(fd); // supprimer le client de la map
@@ -38,9 +25,18 @@ void Server::removeClient(int fd)
     }
 }
 
+std::vector<Channel> Server::getServerChannels()
+{
+    return (_channels);
+}
+
 void	Server::eventClient(Client *Client)
 {
-	int bytes_read = recv(Client->GetSocketFD(), Client->GetBuffer(), sizeof(BUFFER_SIZE), 0);
+	char buffer[BUFFER_SIZE];
+    memset(buffer, 0, BUFFER_SIZE);
+	int bytes_read = recv(Client->GetSocketFD(), buffer, sizeof(buffer), 0);
+	// int bytes_read = 1;
+	// int bytes_read = recv(Client->GetSocketFD(), Client->GetBuffer(), sizeof(BUFFER_SIZE), 0);
 	if (bytes_read <= 0)
 	{
         // Le client s'est déconnecté, supprimer de partout
@@ -49,8 +45,12 @@ void	Server::eventClient(Client *Client)
 	else
     {
         // Traiter le message reçu
-        std::string message(Client->GetBuffer());
-        std::cout << "Message reçu : " << message << std::endl;
+		std::string message(buffer);
+		// std::cout << "buffer:" << Client->GetBuffer() << "|" << std::endl;
+        // std::string message(Client->GetBuffer());
+        std::cout << "[event Client] Message reçu : " << message << std::endl;
+		// Remplir le vecteur buffer_ de la classe Client avec le contenu de message
+        Client->SetBuffer(message);
         this->handleMessage(message, *Client);
     }
 }
@@ -73,7 +73,8 @@ void	Server::run()
             // Vérification si un événement s'est produit sur le socket d'écoute
             if (_pollFds[i].fd == _serverSocket && _pollFds[i].revents & POLLIN)
             {
-
+				std::cout << "map size = " << _MClient.size() << std::endl;
+				std::cout << "serverSocket = " << _serverSocket << std::endl;
                 // Acceptation de la connexion entrante
                 struct sockaddr_in clientAddr;
                 socklen_t clientAddrLen = sizeof(clientAddr);
@@ -89,6 +90,7 @@ void	Server::run()
 				// Ajout du client avec comme pair son fd à la map.
                 std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
 				handleFirstConnection(clientSocket);
+				std::cout << "after handleconnection" << _MClient[clientSocket].GetSocketFD() << "|User =" << _MClient[clientSocket].GetUsername()<< "][" << clientSocket << "] map size = " << _MClient.size() << std::endl;
 				//_MClient.insert(std::make_pair(clientSocket, Client(clientSocket, "val", "venum", "servername", "here"))); // a voir avec ange
             }
 
@@ -107,6 +109,90 @@ void	Server::run()
         }
 	}
 }
+
+void Server::handleFirstConnection(int clientSocket)
+{
+    //recv NICK and PASS and then reply with good format
+	std::cout << "[handleconnection] :" << clientSocket << "|" << std::endl;
+    char buffer[BUFFER_SIZE];
+    memset(buffer, 0, BUFFER_SIZE);
+	int bytes_read = recv(clientSocket, buffer, sizeof(buffer), 0);
+	// if bytes_read = -1 alors netcat sinon autre irc
+	std::cout << "bytes_read :" << bytes_read << std::endl;
+	_MClient.insert(std::make_pair(clientSocket, Client()));
+	_MClient[clientSocket].SetSock_fd(clientSocket);
+	_MClient[clientSocket].SetNickname("Nickkk");
+	_MClient[clientSocket].SetUsername("Userrr");
+	_MClient[clientSocket].SetServername("");
+	_MClient[clientSocket].SetMode("online");
+    std::string message(buffer);
+    std::cout << "Message reçu : " << message << std::endl;
+}
+
+// void Server::handleFirstConnection(int clientSocket)
+// {
+//     //recv NICK and PASS and then reply with good format
+// 	std::cout << "[handleconnection] :" << clientSocket << "|" << std::endl;
+//     char buffer[BUFFER_SIZE];
+//     std::string nickname;
+//     std::string password;
+//     std::string username;
+//     memset(buffer, 0, BUFFER_SIZE);
+//     // int bytes_read = recv(clientSocket, buffer, sizeof(buffer), 0);
+//     // std::cout << "bytes_read : " << bytes_read << std::endl;
+// 	recv(clientSocket, buffer, sizeof(buffer), 0);
+//     // if (bytes_read <= 0)
+//     // {
+//     //     // Le client s'est déconnecté, supprimer son descripteur de fichier
+//     //     std::cout << "Client disconnected by recv" << std::endl;
+//     //     removeClient(clientSocket);
+//     // }
+//     // else
+//     // {
+//         // Traiter le message reçu
+//         std::string message(buffer);
+//         std::cout << "Message reçu : " << message << std::endl;
+//         if (message.find("NICK") != std::string::npos && message.find("PASS") != std::string::npos && message.find("USER") != std::string::npos)
+//         {
+//             std::string::size_type pass_pos = message.find("PASS ");
+//             std::string::size_type nick_pos = message.find("NICK ");
+//             std::string::size_type user_pos = message.find("USER ");
+//             std::string password = message.substr(pass_pos + 5, nick_pos - pass_pos - 6);
+//             std::string nickname = message.substr(nick_pos + 5, user_pos - nick_pos - 6);
+//             std::string username = message.substr(user_pos + 5, message.size() - user_pos - 6);
+//             if (password == _password)
+//             {
+//                 std::string reply = ":127.0.0.1 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + username + "@HOST";
+//                 send(clientSocket, reply.c_str(), reply.size(), 0);
+//                 for (std::map<int, Client>::iterator it = _MClient.begin(); it != _MClient.end(); ++it)
+//                 {
+//                     if (it->second.GetNickname() == nickname)
+//                     {
+//                         std::string reply = ":127.0.0.1 433 " + nickname + " :Nickname is already in use";
+//                         send(clientSocket, reply.c_str(), reply.size(), 0);
+//                         return ;
+//                     }
+//                 }
+//                 //inserer le client dans la map
+//                 _MClient.insert(std::make_pair(clientSocket, Client()));
+//                 _MClient[clientSocket].SetNickname(nickname);
+//                 _MClient[clientSocket].SetUsername(username);
+//                 _MClient[clientSocket].SetServername("");
+//                 _MClient[clientSocket].SetMode("online");
+//             }
+//             else
+//             {
+//                 std::string reply = ":127.0.0.1 464 " + nickname + " :Password incorrect";
+//                 send(clientSocket, reply.c_str(), reply.size(), 0);
+//             }
+//         }
+//         else
+//         {
+//             std::string reply = ":127.0.0.1 464 " + nickname + " :Password incorrect";
+//             send(clientSocket, reply.c_str(), reply.size(), 0);
+//         }
+//     // }
+// }
 
 void	Server::start()
 {
@@ -139,89 +225,6 @@ void	Server::start()
     _pollFds.push_back(serverPollFd);
 	this->run();
 	close(_serverSocket);
-}
-
-
-
-// Server::~Server()
-// {
-//     //delete all clients map if remains
-//     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-//     {
-//         delete it->second;
-//     }
-//     for (size_t i = 0; i < _channels.size(); i++)
-//     {
-//         delete _channels[i];
-//     }
-// }
-
-std::vector<Channel> Server::getServerChannels()
-{
-    return (_channels);
-}
-
-void Server::handleFirstConnection(int clientSocket)
-{
-    //recv NICK and PASS and then reply with good format
-    char buffer[BUFFER_SIZE];
-    std::string nickname;
-    std::string password;
-    std::string username;
-    memset(buffer, 0, BUFFER_SIZE);
-    int bytes_read = recv(clientSocket, buffer, sizeof(buffer), 0);
-    std::cout << "bytes_read : " << bytes_read << std::endl;
-    if (bytes_read <= 0)
-    {
-        // Le client s'est déconnecté, supprimer son descripteur de fichier
-        std::cout << "Client disconnected by recv" << std::endl;
-        removeClient(clientSocket);
-    }
-    else
-    {
-        // Traiter le message reçu
-        std::string message(buffer);
-        std::cout << "Message reçu : " << message << std::endl;
-        if (message.find("NICK") != std::string::npos && message.find("PASS") != std::string::npos && message.find("USER") != std::string::npos)
-        {
-            std::string::size_type pass_pos = message.find("PASS ");
-            std::string::size_type nick_pos = message.find("NICK ");
-            std::string::size_type user_pos = message.find("USER ");
-            std::string password = message.substr(pass_pos + 5, nick_pos - pass_pos - 6);
-            std::string nickname = message.substr(nick_pos + 5, user_pos - nick_pos - 6);
-            std::string username = message.substr(user_pos + 5, message.size() - user_pos - 6);
-            if (password == _password)
-            {
-                std::string reply = ":127.0.0.1 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + username + "@HOST";
-                send(clientSocket, reply.c_str(), reply.size(), 0);
-                for (std::map<int, Client>::iterator it = _MClient.begin(); it != _MClient.end(); ++it)
-                {
-                    if (it->second.GetNickname() == nickname)
-                    {
-                        std::string reply = ":127.0.0.1 433 " + nickname + " :Nickname is already in use";
-                        send(clientSocket, reply.c_str(), reply.size(), 0);
-                        return ;
-                    }
-                }
-                //inserer le client dans la map
-                _MClient.insert(std::make_pair(clientSocket, Client()));
-                _MClient[clientSocket].SetNickname(nickname);
-                _MClient[clientSocket].SetUsername(username);
-                _MClient[clientSocket].SetServername("");
-                _MClient[clientSocket].SetMode("online");
-            }
-            else
-            {
-                std::string reply = ":127.0.0.1 464 " + nickname + " :Password incorrect";
-                send(clientSocket, reply.c_str(), reply.size(), 0);
-            }
-        }
-        else
-        {
-            std::string reply = ":127.0.0.1 464 " + nickname + " :Password incorrect";
-            send(clientSocket, reply.c_str(), reply.size(), 0);
-        }
-    }
 }
 
 void Server::handleRequestError( int error, Client &user ) const

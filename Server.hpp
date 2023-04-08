@@ -17,7 +17,7 @@ private:
 	std::map<int , Client>		_MClient;
 
 public:
-    Server(std::string password, char *port);
+    Server(std::string password, int port);
     ~Server();
 
     void	start();
