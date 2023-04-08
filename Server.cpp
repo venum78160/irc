@@ -258,6 +258,17 @@ int Server::checkNameValidity( std::string &name )
 	return (VALIDNAME);
 }
 
+void	Server::handleMessage(std::string message, Client &client)
+{
+	std::cout << "Message : " << message << std::endl;
+	std::cout << "Client : " << client << std::endl;
+	if (message.find("JOIN") != std::string::npos)
+	{
+		std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
+		this->joinCommand(channelName, client);
+	}
+}
+
 void Server::joinCommand(std::string channelName, Client &client)
 {
 	std::transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
@@ -321,13 +332,12 @@ void Server::joinCommand(std::string channelName, Client &client)
 	send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 }
 
-void	Server::handleMessage(std::string message, Client &client)
+void Server::partCommand(std::string channelName, Client &client)
 {
-	std::cout << "Message : " << message << std::endl;
-	std::cout << "Client : " << client << std::endl;
-	if (message.find("JOIN") != std::string::npos)
-	{
-		std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
-		this->joinCommand(channelName, client);
-	}
+	// Commande : PART #channel ou /part #channel
+	// Mettre en minuscule le nom du channel car il est insensible à la casse
+	// Checker si le channel existe -> si oui, le supprimer de la liste des channels du client, si non, envoyer un message d'erreur
+	// Supprimer le client de la liste des clients du channel
+
+	std::transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
 }
