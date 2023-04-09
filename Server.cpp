@@ -25,7 +25,7 @@ void Server::removeClient(int fd)
     }
 }
 
-std::vector<Channel> Server::getServerChannels()
+std::vector<Channel *> Server::getServerChannels()
 {
     return (_channels);
 }
@@ -252,7 +252,7 @@ int Server::checkNameValidity( std::string &name )
 	int	nameLen = name.size();
 	for (size_t i = 0; i < _channels.size(); i++)
 	{
-		if (_channels[i].getName() == name)
+		if (_channels[i]->getName() == name)
 			return (CHANNELALREADYEXISTS);
 	}
 	if (nameLen > 50)
@@ -295,9 +295,9 @@ void Server::joinCommand(std::string channelName, Client &client)
 			client.RemoveChannel(client.GetChannels()[i]);
 			for (size_t j = 0; j < _channels.size(); j++)
 			{
-				if (_channels[j].getName() == client.GetChannels()[i])
+				if (_channels[j]->getName() == client.GetChannels()[i])
 				{
-					_channels[j].removeUser(client);
+					_channels[j]->removeUser(client);
 					break ;
 				}
 			}
@@ -310,12 +310,12 @@ void Server::joinCommand(std::string channelName, Client &client)
 	for (size_t i = 0; i < _channels.size(); i++)
 	{
 		// channel already exists
-		if (_channels[i].getName() == channelName)
+		if (_channels[i]->getName() == channelName)
 		{
-			Channel newChannel = _channels[i];
+			Channel *newChannel = _channels[i];
 			try
 			{
-				newChannel.addUser(client);
+				newChannel->addUser(client);
 			}
 			catch (const std::exception &e)
 			{
@@ -332,8 +332,8 @@ void Server::joinCommand(std::string channelName, Client &client)
 		}
 	}
 	// channel doesn't exist
-	Channel newChannel(channelName, client);
-	newChannel.addUser(client); // pas besoin de try le channel vient d'être créé il ne peut pas être full
+	Channel *newChannel = new Channel(channelName, client);
+	newChannel->addUser(client); // pas besoin de try le channel vient d'être créé il ne peut pas être full
 	  _channels.push_back(newChannel);
 	// reply sucessfully joined
 	std::string reply = ": " + client.GetNickname() + " JOIN " + channelName;
@@ -354,25 +354,24 @@ void Server::partCommand(std::string channelName, Client &client)
 	// 2
 	Channel *channelToLeave;
 
-	std::vector<Channel *>::iterator it = std::find_if(_channels.begin(), _channels.end(), [&channelName](Channel *channel) { return channel->getName() == channelName; });
-	if (it == _channels.end())
-	{
-		// send error message
-		return ;
-	}
-	else
-		channelToLeave = *it;
-
-	std::vector<std::string> clientChannels = client.GetChannels();
-	for (size_t i = 0; i < clientChannels.size(); i++)
-	{
-		if (clientChannels[i] == channelName)
-		{
-			client.RemoveChannel(channelName);
-			break ;
-		}
-	}
-
-	// 3
-	channelToLeave->removeUser(client);
+    //find channel in _channels by channelName in c++98
+    std::vector<Channel*>::iterator it;
+    for (it = _channels.begin(); it != _channels.end(); ++it) {
+        if ((*it)->getName() == channelName)
+        {
+            channelToLeave = *it;
+            channelToLeave->removeUser(client);
+            for (size_t i = 0; i < client.GetChannels().size(); i++)
+            {
+                if (client.GetChannels()[i] == channelName)
+                {
+                    client.RemoveChannel(channelName);
+                    std::string reply = ": " + client.GetNickname() + " PART " + channelName;
+                    send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+                    return ;
+                }
+            }
+        }
+    }
+    // not found so send error
 }
