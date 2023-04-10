@@ -35,13 +35,19 @@ void	Server::eventClient(Client *Client)
 	char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE);
 	int bytes_read = recv(Client->GetSocketFD(), buffer, sizeof(buffer), 0);
-	// int bytes_read = 1;
-	// int bytes_read = recv(Client->GetSocketFD(), Client->GetBuffer(), sizeof(BUFFER_SIZE), 0);
-	if (bytes_read <= 0)
-	{
-		// Le client s'est déconnecté, supprimer de partout
-		removeClient(Client->GetSocketFD());
-	}
+    if (bytes_read == -1)
+    {
+        //std::cerr << "Error while receiving data from client by eventClient" << std::endl;
+        removeClient(Client->GetSocketFD());
+        return;
+    }
+    // handle client disconnection
+    else if (bytes_read == 0)
+    {
+        std::cerr << "Client disconnected" << std::endl;
+        removeClient(Client->GetSocketFD());
+        return;
+    }
 	else
     {
         // Traiter le message reçu
@@ -67,12 +73,12 @@ void	Server::run()
 			std::cerr << "Erreur lors de l'appel à la fonction poll()" << std::endl;
 			break;
 		}
-		// Parcours de la structure pollfd pour traiter les événements
-		for (size_t i = 0; i < _pollFds.size(); i++)
-		{
-            std::cerr << "Erreur lors de l'appel à la fonction poll()" << std::endl;
-            break;
-        }
+//		// Parcours de la structure pollfd pour traiter les événements
+//		for (size_t i = 0; i < _pollFds.size(); i++)
+//		{
+//            std::cerr << "Erreur lors de l'appel à la fonction poll()" << std::endl;
+//            break;
+//        }
         // Parcours de la structure pollfd pour traiter les événements
         for (size_t i = 0; i < _pollFds.size(); i++)
         {
@@ -91,12 +97,12 @@ void	Server::run()
                 }
 
 				// Ajout du descripteur de fichier du client à la structure pollfd
-				pollfd clientPollFd = {clientSocket, POLLIN | POLLOUT | POLLHUP, 0};
+				pollfd clientPollFd = {clientSocket, POLLIN | POLLHUP, 0};
 				_pollFds.push_back(clientPollFd);
 				// Ajout du client avec comme pair son fd à la map.
 				std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
 				handleFirstConnection(clientSocket);
-				std::cout << "after handleconnection" << _MClient[clientSocket].GetSocketFD() << "|User =" << _MClient[clientSocket].GetUsername()<< "][" << clientSocket << "] map size = " << _MClient.size() << std::endl;
+                //std::cout << "after handleconnection " << _MClient[clientSocket].GetSocketFD() << " | User = [" << _MClient[clientSocket].GetUsername()<< "][" << clientSocket << "] map size = " << _MClient.size() << std::endl;
 				//_MClient.insert(std::make_pair(clientSocket, Client(clientSocket, "val", "venum", "servername", "here"))); // a voir avec ange
 			}
 
@@ -116,24 +122,113 @@ void	Server::run()
 	}
 }
 
-void Server::handleFirstConnection(int clientSocket)
-{
-    //recv NICK and PASS and then reply with good format
-	std::cout << "[handleconnection] :" << clientSocket << "|" << std::endl;
+//write handleFirstConnection to handle the first connection of a new IRC client
+void Server::handleFirstConnection(int clientSocket) {
+    //recv data give at first connection and answer knowing that the server need a password
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE);
-	int bytes_read = recv(clientSocket, buffer, sizeof(buffer), 0);
-	// if bytes_read = -1 alors netcat sinon autre irc
-	std::cout << "bytes_read :" << bytes_read << std::endl;
-	_MClient.insert(std::make_pair(clientSocket, Client()));
-	_MClient[clientSocket].SetSock_fd(clientSocket);
-	_MClient[clientSocket].SetNickname("Nickkk");
-	_MClient[clientSocket].SetUsername("Userrr");
-	_MClient[clientSocket].SetServername("");
-	_MClient[clientSocket].SetMode("online");
+    int bytes_read = recv(clientSocket, buffer, sizeof(buffer), 0);
+    // handle recv error
+    if (bytes_read == -1) {
+        std::cerr << "Error while receiving data from client" << std::endl;
+        removeClient(clientSocket);
+        return;
+    }
+    // handle client disconnection
+    else if (bytes_read == 0)
+    {
+        std::cerr << "Client disconnected" << std::endl;
+        removeClient(clientSocket);
+        return;
+    }
     std::string message(buffer);
-    std::cout << "Message reçu : " << message << std::endl;
+    std::cout << "[event Client] Message reçu : " << message << std::endl;
+    if (message.find("PASS") == std::string::npos) {
+        std::string reply = ":127.0.0.1 461 * PASS :No password supplied\r\n";
+        send(clientSocket, reply.c_str(), reply.size(), 0);
+        return;
+    }
+    if (message.find("NICK") == std::string::npos) {
+        std::string reply = ": 461 * NICK :No nickname given\r\n";
+        send(clientSocket, reply.c_str(), reply.size(), 0);
+        return;
+    }
+    if (message.find("USER") == std::string::npos) {
+        std::string reply = ": 461 * USER :Not enough parameters\r\n";
+        send(clientSocket, reply.c_str(), reply.size(), 0);
+        return;
+    }
+    // if all is good, we can add the client to the map
+    std::string::size_type pass_pos = message.find("PASS ");
+    std::string::size_type nick_pos = message.find("NICK ");
+    std::string::size_type user_pos = message.find("USER ");
+    std::string password = message.substr(pass_pos + 5, nick_pos - pass_pos - 6);
+    std::string nickname = message.substr(nick_pos + 5, user_pos - nick_pos - 6);
+    std::string username = message.substr(user_pos + 5, message.size() - user_pos - 6);
+    password.erase(std::remove(password.begin(), password.end(), '\r'), password.end());
+    password.erase(std::remove(password.begin(), password.end(), '\n'), password.end());
+    nickname.erase(std::remove(nickname.begin(), nickname.end(), '\r'), nickname.end());
+    nickname.erase(std::remove(nickname.begin(), nickname.end(), '\n'), nickname.end());
+    username.erase(std::remove(username.begin(), username.end(), '\r'), username.end());
+    username.erase(std::remove(username.begin(), username.end(), '\n'), username.end());
+    username = username.substr(0, username.find(" "));
+    if (password == _password)
+    {
+        for (std::map<int, Client>::iterator it = _MClient.begin(); it != _MClient.end(); ++it)
+        {
+            if (it->second.GetNickname() == nickname)
+            {
+                std::string reply = ":127.0.0.1 433 " + nickname + " :Nickname is already in use\r\n";
+                send(clientSocket, reply.c_str(), reply.size(), 0);
+                return ;
+            }
+        }
+        //inserer le client dans la map
+        _MClient.insert(std::make_pair(clientSocket, Client()));
+        _MClient[clientSocket].SetNickname(nickname);
+        _MClient[clientSocket].SetUsername(username);
+        _MClient[clientSocket].SetServername("");
+        _MClient[clientSocket].SetMode("online");
+        std::cout << "Client " << nickname << " Username : " << username << " connected" << std::endl;
+        std::string reply = ":127.0.0.1 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + username + "@HOST\r\n";
+        send(clientSocket, reply.c_str(), reply.size(), 0);
+        reply = ":127.0.0.1 002 " + nickname + " :Your host is ourIRC, running version 1.0\r\n";
+        send(clientSocket, reply.c_str(), reply.size(), 0);
+        reply = ":127.0.0.1 003 " + nickname + " :This server was created not a long time ago\r\n";
+        send(clientSocket, reply.c_str(), reply.size(), 0);
+        reply = ":127.0.0.1 004 ourIRC 1.0";
+        send(clientSocket, reply.c_str(), reply.size(), 0);
+        reply = ":127.0.0.1 005 " + nickname + " PREFIX=(ov)@+ CHANTYPES=# CHARSET=UTF-8 :are supported by this server\r\n";
+        send(clientSocket, reply.c_str(), reply.size(), 0);
+        reply = ":127.0.0.1 376 " + nickname + " :End of /MOTD command.\r\n";
+        send(clientSocket, reply.c_str(), reply.size(), 0);
+        std::cout << "Sending to client" << std::endl;
+    }
+    else
+    {
+        std::string reply = ":127.0.0.1 464 " + nickname + " :Password incorrect\r\n";
+        send(clientSocket, reply.c_str(), reply.size(), 0);
+    }
 }
+//
+//void Server::handleFirstConnection(int clientSocket)
+//{
+//    //recv NICK and PASS and then reply with good format
+//	std::cout << "[handleconnection] :" << clientSocket << "|" << std::endl;
+//    char buffer[BUFFER_SIZE];
+//    memset(buffer, 0, BUFFER_SIZE);
+//	int bytes_read = recv(clientSocket, buffer, sizeof(buffer), 0);
+//	// if bytes_read = -1 alors netcat sinon autre irc
+//	std::cout << "bytes_read :" << bytes_read << std::endl;
+//	_MClient.insert(std::make_pair(clientSocket, Client()));
+//	_MClient[clientSocket].SetSock_fd(clientSocket);
+//	_MClient[clientSocket].SetNickname("Nickkk");
+//	_MClient[clientSocket].SetUsername("Userrr");
+//	_MClient[clientSocket].SetServername("");
+//	_MClient[clientSocket].SetMode("online");
+//    std::string message(buffer);
+//    std::cout << "Message reçu : " << message << std::endl;
+//}
 
 // void Server::handleFirstConnection(int clientSocket)
 // {
@@ -227,7 +322,7 @@ void	Server::start()
 	}
 
 	// Création de la structure pollfd pour surveiller les descripteurs de fichiers
-	pollfd serverPollFd = {_serverSocket, POLLIN, 0};
+	pollfd serverPollFd = {_serverSocket, POLLIN | POLLHUP, 0};
 	_pollFds.push_back(serverPollFd);
 	this->run();
 	close(_serverSocket);
