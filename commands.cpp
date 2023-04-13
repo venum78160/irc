@@ -6,30 +6,33 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/13 17:14:08 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/13 21:45:48 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_irc.hpp"
 
-void    parseCommand(std::string message, Client &client)
-{
+// void    parseCommand(std::string message, Client &client)
+// {
 	
-}
+// }
 
 
 
 
 void	Server::handleMessage(std::string message, Client &client)
 {
-	std::cout << "Message : " << message << std::endl;
-	std::cout << "Client : " << client << std::endl;
-	if (message.find("JOIN") != std::string::npos)
+	std::cout << "Message : " << message << " from " << client << std::endl;
+	if (message.find("JOIN") != std::string::npos && message.find("JOIN") == 0)
 	{
+		std::cout << "in join" << std::endl;
 		std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
 		this->joinCommand(channelName, client);
 	}
-    else if 
+	else if (message.find("PART") != std::string::npos && message.find("PART") == 0)
+	{
+		
+	}
 }
 
 void Server::joinCommand(std::string channelName, Client &client)
