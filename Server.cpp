@@ -52,12 +52,11 @@ void	Server::eventClient(Client *Client)
     {
         // Traiter le message reçu
 		std::string message(buffer);
-		// std::cout << "buffer:" << Client->GetBuffer() << "|" << std::endl;
-        // std::string message(Client->GetBuffer());
         std::cout << "[event Client] Message reçu : " << message << std::endl;
 		// Remplir le vecteur buffer_ de la classe Client avec le contenu de message
         Client->SetBuffer(message);
         this->handleMessage(message, *Client);
+        return ;
     }
 }
 
@@ -73,20 +72,17 @@ void	Server::run()
 			std::cerr << "Erreur lors de l'appel à la fonction poll()" << std::endl;
 			break;
 		}
-//		// Parcours de la structure pollfd pour traiter les événements
-//		for (size_t i = 0; i < _pollFds.size(); i++)
-//		{
-//            std::cerr << "Erreur lors de l'appel à la fonction poll()" << std::endl;
-//            break;
-//        }
-        // Parcours de la structure pollfd pour traiter les événements
+        if (pollResult == 0)
+        {
+            std::cerr << "Timeout while waiting for events" << std::endl;
+            break;
+        }
+        // Parcours de la liste des descripteurs de fichiers surveillés
         for (size_t i = 0; i < _pollFds.size(); i++)
         {
             // Vérification si un événement s'est produit sur le socket d'écoute
             if (_pollFds[i].fd == _serverSocket && _pollFds[i].revents & POLLIN)
             {
-				std::cout << "map size = " << _MClient.size() << std::endl;
-				std::cout << "serverSocket = " << _serverSocket << std::endl;
                 // Acceptation de la connexion entrante
                 struct sockaddr_in clientAddr;
                 socklen_t clientAddrLen = sizeof(clientAddr);
@@ -97,33 +93,54 @@ void	Server::run()
                 }
 
 				// Ajout du descripteur de fichier du client à la structure pollfd
-				pollfd clientPollFd = {clientSocket, POLLIN | POLLHUP, 0};
+				pollfd clientPollFd = {clientSocket, POLLIN | POLLHUP | POLLERR, 0};
 				_pollFds.push_back(clientPollFd);
 				// Ajout du client avec comme pair son fd à la map.
 				std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
-				handleFirstConnection(clientSocket);
-                //std::cout << "after handleconnection " << _MClient[clientSocket].GetSocketFD() << " | User = [" << _MClient[clientSocket].GetUsername()<< "][" << clientSocket << "] map size = " << _MClient.size() << std::endl;
-				//_MClient.insert(std::make_pair(clientSocket, Client(clientSocket, "val", "venum", "servername", "here"))); // a voir avec ange
-			}
-
+            }
 			// Vérification si un événement s'est produit sur l'un des sockets des clients
 			else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLIN)
 			{
+                // check if fd exist in _MClient
+                if (_MClient.find(_pollFds[i].fd) == _MClient.end())
+                {
+                    handleFirstConnection(_pollFds[i].fd);
+                    continue;
+                }
 				int fd_client = _pollFds[i].fd;
-				// Client* client = &_MClient[fd_client];
 				eventClient(&_MClient[fd_client]);
+                if (_pollFds[i].revents & (POLLERR | POLLHUP))
+                {
+                    std::cerr << "Client disconnected" << std::endl;
+                    removeClient(_pollFds[i].fd);
+                }
 			}
-			else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLHUP)
+			else if (_pollFds[i].revents & (POLLHUP | POLLERR))
 			{
 				std::cout << "Déconnexion du client" << std::endl;
 				removeClient(_pollFds[i].fd);
 			}
+            // send message to client to check if already connected
+            for (std::map<int, Client>::iterator it = _MClient.begin(); it != _MClient.end(); it++)
+            {
+                if (it->second.GetSocketFD() != _serverSocket)
+                {
+                    std::string message = "PING";
+                    int bytes_sent = send(it->second.GetSocketFD(), message.c_str(), message.length(), 0);
+                    if (bytes_sent < 0)
+                    {
+                        std::cerr << "Error while sending data to client" << std::endl;
+                        removeClient(it->second.GetSocketFD());
+                    }
+                    std::cout << _MClient.size() << std::endl;
+                }
+            }
 		}
 	}
 }
 
 //write handleFirstConnection to handle the first connection of a new IRC client
-void Server::handleFirstConnection(int clientSocket) {
+int Server::handleFirstConnection(int clientSocket) {
     //recv data give at first connection and answer knowing that the server need a password
     char buffer[BUFFER_SIZE];
     memset(buffer, 0, BUFFER_SIZE);
@@ -132,31 +149,31 @@ void Server::handleFirstConnection(int clientSocket) {
     if (bytes_read == -1) {
         std::cerr << "Error while receiving data from client" << std::endl;
         removeClient(clientSocket);
-        return;
+        return (0);
     }
     // handle client disconnection
     else if (bytes_read == 0)
     {
         std::cerr << "Client disconnected" << std::endl;
         removeClient(clientSocket);
-        return;
+        return (0);
     }
     std::string message(buffer);
-    std::cout << "[event Client] Message reçu : " << message << std::endl;
+    std::cout << "[fiest co] Message reçu : " << message << std::endl;
     if (message.find("PASS") == std::string::npos) {
         std::string reply = ":127.0.0.1 461 * PASS :No password supplied\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);
-        return;
+        return (0);
     }
     if (message.find("NICK") == std::string::npos) {
         std::string reply = ": 461 * NICK :No nickname given\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);
-        return;
+        return (0);
     }
     if (message.find("USER") == std::string::npos) {
         std::string reply = ": 461 * USER :Not enough parameters\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);
-        return;
+        return (0);
     }
     // if all is good, we can add the client to the map
     std::string::size_type pass_pos = message.find("PASS ");
@@ -180,7 +197,7 @@ void Server::handleFirstConnection(int clientSocket) {
             {
                 std::string reply = ":127.0.0.1 433 " + nickname + " :Nickname is already in use\r\n";
                 send(clientSocket, reply.c_str(), reply.size(), 0);
-                return ;
+                return (0);
             }
         }
         //inserer le client dans la map
@@ -203,11 +220,13 @@ void Server::handleFirstConnection(int clientSocket) {
         reply = ":127.0.0.1 376 " + nickname + " :End of /MOTD command.\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);
         std::cout << "Sending to client" << std::endl;
+        return (1);
     }
     else
     {
         std::string reply = ":127.0.0.1 464 " + nickname + " :Password incorrect\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);
+        return (0);
     }
 }
 //
@@ -322,7 +341,7 @@ void	Server::start()
 	}
 
 	// Création de la structure pollfd pour surveiller les descripteurs de fichiers
-	pollfd serverPollFd = {_serverSocket, POLLIN | POLLHUP, 0};
+	pollfd serverPollFd = {_serverSocket, POLLIN, 0};
 	_pollFds.push_back(serverPollFd);
 	this->run();
 	close(_serverSocket);
@@ -333,11 +352,11 @@ void Server::handleRequestError( int error, Client &user ) const
 	std::string reply;
 
 	if (error == NOTENOUGHPARAMS)
-		reply = ":127.0.0.1 461 " + user.GetNickname() + " :Not enough parameters";
+		reply = ":127.0.0.1 461 " + user.GetNickname() + " :Not enough parameters\r\n";
 	else if (error == NAMETOOLONG)
-		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name too long";
+		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name too long\r\n";
 	else if (error == WRONGNAME)
-		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name contains illegal characters";
+		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name contains illegal characters\r\n";
 
 	send(user.GetSocketFD(), reply.c_str(), reply.size(), 0);
 }
@@ -397,7 +416,7 @@ void Server::joinCommand(std::string channelName, Client &client)
 				}
 			}
 		}
-		std::string reply = ": " + client.GetNickname() + " JOIN 0";
+		std::string reply = ": " + client.GetNickname() + " JOIN 0\r\n";
 		send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 		return ;
 	}
@@ -416,11 +435,11 @@ void Server::joinCommand(std::string channelName, Client &client)
 			{
 				std::cerr << client.GetNickname() << " : " << e.what() << std::endl;
 				// make reply for full channels
-				std::string reply = ":127.0.0.1 471 " + client.GetNickname() + " :Cannot join channel (+l)";
+				std::string reply = ":127.0.0.1 471 " + client.GetNickname() + " :Cannot join channel (+l)\r\n";
 				return;
 			}
 			// reply sucessfully joined
-			std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName;
+			std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName + + "\r\n";
 			send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 			client.SetServername(channelName);
 			return ;
@@ -431,7 +450,7 @@ void Server::joinCommand(std::string channelName, Client &client)
 	newChannel->addUser(client); // pas besoin de try le channel vient d'être créé il ne peut pas être full
 	  _channels.push_back(newChannel);
 	// reply sucessfully joined
-	std::string reply = ": " + client.GetNickname() + " JOIN " + channelName;
+	std::string reply = ": " + client.GetNickname() + " JOIN " + channelName + "\r\n";
 	client.SetServername(channelName);
 	send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 }
@@ -461,7 +480,7 @@ void Server::partCommand(std::string channelName, Client &client)
                 if (client.GetChannels()[i] == channelName)
                 {
                     client.RemoveChannel(channelName);
-                    std::string reply = ": " + client.GetNickname() + " PART " + channelName;
+                    std::string reply = ": " + client.GetNickname() + " PART " + channelName + "\r\n";
                     send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                     return ;
                 }

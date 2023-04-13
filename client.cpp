@@ -90,13 +90,13 @@ void Client::SetServername(const std::string& servername) {
 void Client::SetMode(const std::string& mode) {
     mode_ = mode;
 }
-
 void Client::AddChannel(const std::string& channel) {
     channels_.push_back(channel);
 }
 
 void Client::RemoveChannel(const std::string& channel) {
     for (std::vector<std::string>::iterator it = channels_.begin(); it != channels_.end(); ++it) {
+
         if (*it == channel) {
             channels_.erase(it);
             break;
