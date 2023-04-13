@@ -29,7 +29,7 @@ public:
 	Client 					getClientbyFd(int fd);
 
 	void	handleMessage(std::string message, Client &client);
-	void	handleFirstConnection(int clientSocket);
+	int 	handleFirstConnection(int clientSocket);
 	void	removeClient(int fd);
 
 	int		checkNameValidity( std::string &name );

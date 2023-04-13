@@ -121,7 +121,7 @@ void	Server::run()
 				removeClient(_pollFds[i].fd);
 			}
             // send message to client to check if already connected
-            for (std::map<int, Client>::iterator it = _MClient.begin(); it != _MClient.end(); it++)
+           /* for (std::map<int, Client>::iterator it = _MClient.begin(); it != _MClient.end(); it++)
             {
                 if (it->second.GetSocketFD() != _serverSocket)
                 {
@@ -132,9 +132,8 @@ void	Server::run()
                         std::cerr << "Error while sending data to client" << std::endl;
                         removeClient(it->second.GetSocketFD());
                     }
-                    std::cout << _MClient.size() << std::endl;
                 }
-            }
+            }*/
 		}
 	}
 }
