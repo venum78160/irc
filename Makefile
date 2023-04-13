@@ -1,7 +1,8 @@
 NAME = ircserv
 CC = c++
 FLAGS = -Wall -Werror -Wextra -std=c++98
-SRCS = main.cpp client.cpp Server.cpp Channel.cpp
+SRCS = main.cpp client.cpp Channel.cpp \
+		$(addprefix Server/, run.cpp Server.cpp) \
 
 all: $(NAME)
 

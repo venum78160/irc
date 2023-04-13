@@ -1,5 +1,5 @@
 #pragma once
-#include "ft_irc.hpp"
+#include "../ft_irc.hpp"
 
 class Channel;
 class Client;
@@ -29,11 +29,14 @@ public:
 	Client 					getClientbyFd(int fd);
 
 	void	handleMessage(std::string message, Client &client);
-	int 	handleFirstConnection(int clientSocket);
+	void 	handleFirstConnection(int clientSocket);
 	void	removeClient(int fd);
 
 	int		checkNameValidity( std::string &name );
 	void	handleRequestError( int error, Client &user ) const;
+	bool	isClientAdded(int fd) const;
+	bool	is_good_infos(std::string message, int clientSocket);
+	
 
 
 	// Commands
