@@ -21,7 +21,7 @@
 
 #include "client.hpp"
 #include "Channel.hpp"
-#include "Server.hpp"
+#include "Server/Server.hpp"
 
 #define MAX_CLIENTS 10
 #define BUFFER_SIZE 512 // Taille du buffer de réception
@@ -32,3 +32,7 @@
 #define WRONGNAME 2
 #define CHANNELALREADYEXISTS 3
 #define VALIDNAME 4
+
+#define bg_black        "[40m"
+#define red             "[1;31m"
+#define reset           "[0m"
