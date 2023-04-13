@@ -44,7 +44,7 @@ void Server::handleFirstConnection(int clientSocket)
    if (bytes_read > 1 && buffer[bytes_read - 1] == '\n')
         buffer[bytes_read - 1] = '\0';
 	std::string message(buffer);
-	std::cout << "Message reçu : " << message << "with " << bytes_read <<" bytes read"<<std::endl;
+	std::cout << "Message reçu : " << message << " with " << bytes_read << " bytes read" <<std::endl;
 	if (is_good_infos(message, clientSocket) == false)
 		return;
 	std::string password, nickname, username;
