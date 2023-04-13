@@ -469,8 +469,9 @@ void Server::partCommand(std::string channelName, Client &client)
 
     //find channel in _channels by channelName in c++98
     std::vector<Channel*>::iterator it;
-    for (it = _channels.begin(); it != _channels.end(); ++it) {
-        if ((*it)->getName() == channelName)
+    for (it = _channels.begin(); it != _channels.end(); ++it)
+    {
+        if ((*it)->getName() == channelName) // channel trouvé dans le vector
         {
             channelToLeave = *it;
             channelToLeave->removeUser(client);
