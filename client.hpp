@@ -25,6 +25,7 @@ public:
     std::string GetNickname() const;
     std::string GetUsername() const;
     std::string GetServername() const;
+    std::string getFullId() const;
     std::string GetMode() const;
     std::vector<std::string> GetChannels() const;
 
@@ -34,6 +35,7 @@ public:
     void SetNickname(const std::string& nickname);
     void SetUsername(const std::string& username);
     void SetServername(const std::string& servername);
+    void setFullId( const std::string &fullId );
     void SetMode(const std::string& mode);
     void AddChannel(const std::string& channel);
     void RemoveChannel(const std::string& channel);
@@ -45,6 +47,7 @@ private:
     std::string username_;
     std::string servername_;
     std::string mode_;
+    std::string fullId_;
     std::vector<std::string> channels_;
 };
 

@@ -35,8 +35,8 @@ void	Server::run()
 
 				// Ajout du descripteur de fichier du client à la structure pollfd
 				pollfd clientPollFd = {clientSocket, POLLIN | POLLHUP | POLLERR, 0};
-				handleFirstConnection(clientSocket);
 				std::cout << "Nouvelle connexion entrante depuis " << inet_ntoa(clientAddr.sin_addr) << std::endl;
+				handleFirstConnection(clientSocket);
 				if(isClientAdded(clientSocket) == true)
 				{
 					std::cout << "Client " << _MClient[clientSocket].GetNickname() << " ajouté." << std::endl;
@@ -47,12 +47,6 @@ void	Server::run()
 			// Vérification si un événement s'est produit sur l'un des sockets des clients
 			else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLIN)
 			{
-                // check if fd exist in _MClient
-                // if (_MClient.find(_pollFds[i].fd) == _MClient.end())
-                // {
-                //     handleFirstConnection(_pollFds[i].fd);
-                //     continue;
-                // }
 				int fd_client = _pollFds[i].fd;
 				eventClient(&_MClient[fd_client]);
                 if (_pollFds[i].revents & (POLLERR | POLLHUP))
@@ -68,6 +62,40 @@ void	Server::run()
 			}
 		}
 	}
+}
+
+void	Server::start()
+{
+	// Création du socket d'écoute
+	_serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (_serverSocket == -1) {
+		std::cerr << "Erreur lors de la création du socket d'écoute" << std::endl;
+		exit (1);
+	}
+
+	// Définition des paramètres du socket d'écoute
+	_serverAddr.sin_family = AF_INET;
+	_serverAddr.sin_addr.s_addr = INADDR_ANY;
+	_serverAddr.sin_port = htons(_port);
+
+	// Association du socket d'écoute à l'adresse et au port spécifiés
+	if (bind(_serverSocket, (struct sockaddr *)&_serverAddr, sizeof(_serverAddr)) < 0) {
+		std::cerr << "Erreur lors de l'association du socket d'écoute à l'adresse et au port spécifiés" << std::endl;
+		exit (1);
+	}
+
+	// Mise en attente de connexions entrantes
+	if (listen(_serverSocket, MAX_CLIENTS) < 0) {
+		std::cerr << "Erreur lors de la mise en attente de connexions entrantes" << std::endl;
+		exit (1);
+	}
+
+	// Création de la structure pollfd pour surveiller les descripteurs de fichiers
+	std::cout << bg_black red << "Waiting for connections..." << reset << std::endl;
+	pollfd serverPollFd = {_serverSocket, POLLIN, 0};
+	_pollFds.push_back(serverPollFd);
+	this->run();
+	close(_serverSocket);
 }
 
 // /connect server port password

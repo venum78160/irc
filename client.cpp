@@ -50,6 +50,11 @@ std::vector<std::string> Client::GetChannels() const {
     return channels_;
 }
 
+std::string Client::getFullId( void ) const
+{
+    return fullId_;
+}
+
 //******************************//
 // 		  S E T T E R S		    //
 //******************************//
@@ -73,6 +78,11 @@ void Client::SetUsername(const std::string& username) {
 
 void Client::SetServername(const std::string& servername) {
     servername_ = servername;
+}
+
+void Client::setFullId(const std::string &fullId)
+{
+    fullId_ = fullId;
 }
 
 void Client::SetMode(const std::string& mode) {
@@ -111,6 +121,7 @@ Client& Client::operator=(const Client& other)
         nickname_ = other.nickname_;
         username_ = other.username_;
         servername_ = other.servername_;
+        fullId_ = other.fullId_;
         mode_ = other.mode_;
     }
     return *this;

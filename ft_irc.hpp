@@ -36,3 +36,6 @@
 #define bg_black        "[40m"
 #define red             "[1;31m"
 #define reset           "[0m"
+
+std::vector<std::string> split(const std::string& s, char delimiter);
+bool parseClientInfo(const std::string& message, std::string& password, std::string& nickname, std::string& username);
