@@ -28,9 +28,10 @@ public:
 	std::vector<Channel *>	getServerChannels();
 	Client 					getClientbyFd(int fd);
 
-	void	handleMessage(std::string message, Client &client);
-	void 	handleFirstConnection(int clientSocket);
-	void	removeClient(int fd);
+	void		handleMessage(std::string message, Client &client);
+	void 		handleFirstConnection(int clientSocket);
+	void		removeClient(int fd);
+	std::string	recvAllData(int clientSocket);
 
 	int		checkNameValidity( std::string &name );
 	void	handleRequestError( int error, Client &user ) const;

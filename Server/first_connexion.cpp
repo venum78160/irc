@@ -12,7 +12,28 @@ std::vector<std::string> split(const std::string& s, char delimiter) {
     return tokens;
 }
 
-bool parseClientInfo(const std::string& message, std::string& password, std::string& nickname, std::string& username) {
+void removeNewlinesAndDoubleSpaces(std::string& str)
+{
+    // Supprimer les retours à la ligne (\r et \n)
+    size_t pos = str.find_first_of("\r\n");
+    while (pos != std::string::npos) {
+        str.replace(pos, 1, " ");
+        pos = str.find_first_of("\r\n", pos);
+    }
+
+    // Supprimer les doubles espaces
+    pos = str.find("  ");
+    while (pos != std::string::npos) {
+        str.erase(pos, 1);
+        pos = str.find("  ", pos);
+    }
+}
+
+bool parseClientInfo(std::string& message, std::string& password, std::string& nickname, std::string& username)
+{
+	std::cout << "[parse_info]:" << message << "|"<< std::endl;
+	removeNewlinesAndDoubleSpaces(message);
+	std::cout << "[parse_info]2:" << message << "|"<< std::endl;
     std::vector<std::string> tokens = split(message, ' ');
     bool pass_found = false, nick_found = false, user_found = false;
 
@@ -34,17 +55,31 @@ bool parseClientInfo(const std::string& message, std::string& password, std::str
     return (pass_found && nick_found && user_found);
 }
 
+std::string Server::recvAllData(int clientSocket)
+{
+    std::string data;
+    char buffer[BUFFER_SIZE];
+    int bytes_read;
+
+    do {
+        memset(buffer, 0, BUFFER_SIZE);
+        bytes_read = recv(clientSocket, buffer, BUFFER_SIZE, 0);
+        if (bytes_read == -1) {
+            std::cerr << "Error receiving data from client " << clientSocket << std::endl;
+            return "";
+        }
+        data += buffer;
+    } while (bytes_read == BUFFER_SIZE);
+
+    return data;
+}
+
 void Server::handleFirstConnection(int clientSocket)
 {
    //recv NICK and PASS and then reply with good format
    std::cout << "[handleconnection] :" << clientSocket << "|" << std::endl;
-   char buffer[BUFFER_SIZE];
-   memset(buffer, 0, BUFFER_SIZE);
-   int bytes_read = recv(clientSocket, buffer, sizeof(buffer), 0);
-   if (bytes_read > 1 && buffer[bytes_read - 1] == '\n')
-        buffer[bytes_read - 1] = '\0';
-	std::string message(buffer);
-	std::cout << "Message reçu : " << message << " with " << bytes_read << " bytes read" <<std::endl;
+	std::string message = recvAllData(clientSocket);
+	std::cout << "Message reçu : |" << message << "|" <<std::endl;
 	if (is_good_infos(message, clientSocket) == false)
 		return;
 	std::string password, nickname, username;
@@ -64,10 +99,12 @@ void Server::handleFirstConnection(int clientSocket)
         }
         //inserer le client dans la map
         _MClient.insert(std::make_pair(clientSocket, Client()));
+		_MClient[clientSocket].SetSock_fd(clientSocket);
         _MClient[clientSocket].SetNickname(nickname);
         _MClient[clientSocket].SetUsername(username);
         _MClient[clientSocket].SetServername("");
         _MClient[clientSocket].SetMode("online");
+
         std::string reply = ":127.0.0.1 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + username + "@HOST\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);
         reply = ":127.0.0.1 002 " + nickname + " :Your host is ourIRC, running version 1.0\r\n";

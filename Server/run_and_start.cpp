@@ -18,6 +18,7 @@ void	Server::run()
             std::cerr << "Timeout while waiting for events" << std::endl;
             break;
         }
+		std::cout << "-------je suis apres dans le poll" << std::endl;
         // Parcours de la liste des descripteurs de fichiers surveillés
         for (size_t i = 0; i < _pollFds.size(); i++)
         {
@@ -39,7 +40,7 @@ void	Server::run()
 				handleFirstConnection(clientSocket);
 				if(isClientAdded(clientSocket) == true)
 				{
-					std::cout << "Client " << _MClient[clientSocket].GetNickname() << " ajouté." << std::endl;
+					std::cout << "Client " << _MClient[clientSocket].GetSocketFD() << " " << _MClient[clientSocket].GetNickname() << " ajouté." << std::endl;
 					_pollFds.push_back(clientPollFd);
 				}
 				continue;

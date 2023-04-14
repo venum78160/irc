@@ -105,6 +105,10 @@ void Client::RemoveChannel(const std::string& channel) {
     }
 }
 
+void Client::printClientInfo() {
+    std::cout << "Print Client : Socket FD: " << GetSocketFD() << " Nickname: " << GetNickname() << " Username: " << GetUsername() << std::endl;
+}
+
 //******************************//
 // 		  O P E R A T O R S     //
 //******************************//
