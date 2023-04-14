@@ -24,7 +24,7 @@
 #include "Server/Server.hpp"
 
 #define MAX_CLIENTS 10
-#define BUFFER_SIZE 512 // Taille du buffer de réception
+#define BUFFER_SIZE 1024 // Taille du buffer de réception
 
 // ERROR CODES
 #define NAMETOOLONG 0
