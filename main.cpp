@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 20:38:50 by vl-hotel          #+#    #+#             */
-/*   Updated: 2023/04/08 18:14:45 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/12 19:20:31 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,33 +38,33 @@ void handle_command(std::string command, Client* sender, std::map<std::string, c
 
 int main(int ac, char **av) {
 
-    if (ac != 3)
-    {
-        std::cerr << "Usage: " << av[0] << " <port> <password>" << std::endl;
-        return 1;
-    }
+	if (ac != 3)
+	{
+		std::cerr << "Usage: " << av[0] << " <port> <password>" << std::endl;
+		return 1;
+	}
 	int port;
 	try // plutôt try et catch dans le main avant d'envoyer port au constructeur
-    {
-    	port = std::atoi(av[1]);
-    }
-    catch (const std::invalid_argument& e)
-    {
-        std::cerr << "Erreur : la chaîne n'est pas un entier valide." << std::endl;
+	{
+		port = std::atoi(av[1]);
+	}
+	catch (const std::invalid_argument& e)
+	{
+		std::cerr << "Erreur : la chaîne n'est pas un entier valide." << std::endl;
 		exit(1);
-    }
-    catch (const std::out_of_range& e)
-    {
-        std::cerr << "Erreur : la chaîne représente un entier en dehors de la plage de valeurs valides." << std::endl;
+	}
+	catch (const std::out_of_range& e)
+	{
+		std::cerr << "Erreur : la chaîne représente un entier en dehors de la plage de valeurs valides." << std::endl;
 		exit(1);
-    }
-    Server server(av[2], port);
+	}
+	Server server(av[2], port);
 
-    server.start();
-    // Gérer les connexions en appelant handle_new_connection
-    // Gérer les messages en appelant handle_client_message
-    // Gérer les commandes en appelant handle_command
-    return 0;
+	server.start();
+	// Gérer les connexions en appelant handle_new_connection
+	// Gérer les messages en appelant handle_client_message
+	// Gérer les commandes en appelant handle_command
+	return 0;
 }
 
 
