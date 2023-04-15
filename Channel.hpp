@@ -13,6 +13,7 @@ private:
     std::vector<std::string>    _userNicks;
 	int				            _maxUsers;
 	std::string					_topic;
+	std::vector<std::string>	_blacklist;
 	Channel( void );
 
 public:
@@ -26,7 +27,7 @@ public:
 	// Accessors
 	std::string 	getName( void ) const;
 	// void			rename( std::string name );
-	int	getUserLimit( void ) const;
+	int 			getUserLimit( void ) const;
 	void			setUserLimit( int limit );
 
 	bool	checkNameValidity( std::string &name ); // checks if channel name is valid. should later be included in Server class as well
