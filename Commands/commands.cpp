@@ -150,6 +150,8 @@ void Server::partCommand(std::string channelName, Client &client)
 void Server::quitCommand(Client &client, std::string message)
 {
     std::string quitMessage = message.substr(5);
+    if (quitMessage.size() == 0)
+        quitMessage = "Client Quit";
     std::string reply = ": " + client.GetNickname() + " QUIT :" + quitMessage + "\r\n";
     send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
     for (size_t i = 0; i < client.GetChannels().size(); i++)
