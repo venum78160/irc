@@ -34,7 +34,8 @@ public:
 	std::string	recvAllData(int clientSocket);
 
 	int		checkNameValidity( std::string &name );
-	void	handleRequestError( int error, Client &user ) const;
+	// void	handleRequestError( int error, Client &user ) const;
+	void	handleReplies( int code, std::string param, Client &client );
 	bool	isClientAdded(int fd) const;
 	bool	is_good_infos(std::string message, int clientSocket);
 	
@@ -42,7 +43,10 @@ public:
 
 	// Commands
 	void	ft_join(std::string message, Client &client);
-	void	joinChannel( std::string channelName, Client &client );
+	bool	joinErrors(Channel *channel, Client &client);
+	void	joinChannel( Channel *channel, Client &client );
+
+	void	createChannel( std::string channelName, Client &client );
 
 	void	partCommand( std::string channelName, Client &client );
 	void	privMsgCommand( std::string command, Client &sender );

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <cstdlib>
 #include <exception>
 #include <sys/types.h>
 #include <sys/socket.h>

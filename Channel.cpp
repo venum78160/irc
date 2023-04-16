@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vl-hotel <vl-hotel@student.42.fr>          +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/06 20:38:20 by vl-hotel         ###   ########.fr       */
+/*   Updated: 2023/04/16 18:02:29 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,21 +63,21 @@ void Channel::setUserLimit( int limit )
 	this->_maxUsers = limit;
 }
 
-bool	Channel::checkNameValidity( std::string &name )
-{
-	int	nameLen = name.size();
-	if (nameLen > 50 || nameLen < 2)
-		return (false);
-	if (name[0] != '#')
-		return (false);
+// bool	Channel::checkNameValidity( std::string &name )
+// {
+// 	int	nameLen = name.size();
+// 	if (nameLen > 50 || nameLen < 2)
+// 		return (false);
+// 	if (name[0] != '#')
+// 		return (false);
 
-	for (int i = 0; i < nameLen; i++)
-	{
-		if (isspace(name[i]) || name[i] == ',' || name[i] == 7)
-			return (false);
-	}
-	return (true);
-}
+// 	for (int i = 0; i < nameLen; i++)
+// 	{
+// 		if (isspace(name[i]) || name[i] == ',' || name[i] == 7)
+// 			return (false);
+// 	}
+// 	return (true);
+// }
 
 void Channel::sendMessage( std::string message, Client const receiver )
 {
@@ -147,9 +147,20 @@ std::string	Channel::getTopic( void ) const
 {
 	return (this->_topic);
 }
+
 bool Channel::operator==(const Channel& rhs) const
 {
-    return (this->_name == rhs._name);
+	return (this->_name == rhs._name);
+}
+
+int Channel::getNbUsers( void ) const
+{
+	return (this->_users.size());
+}
+
+std::vector<std::string> Channel::getBlacklist( void ) const
+{
+	return (this->_blacklist);
 }
 
 bool Channel::operator<(const Channel& rhs) const

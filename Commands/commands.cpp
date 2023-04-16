@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/15 18:29:10 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/16 17:28:42 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,19 @@ std::vector<std::string> splitStr( std::string str, char sep )
 	return (ret);
 }
 
+// void Server::handleRequestError( int error, Client &user ) const
+// {
+// 	std::string reply;
 
+// 	if (error == NOTENOUGHPARAMS)
+// 		reply = ":127.0.0.1 461 " + user.GetNickname() + " :Not enough parameters\r\n";
+// 	else if (error == NAMETOOLONG)
+// 		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name too long\r\n";
+// 	else if (error == WRONGNAME)
+// 		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name contains illegal characters\r\n";
+
+// 	send(user.GetSocketFD(), reply.c_str(), reply.size(), 0);
+// }
 
 
 void	Server::handleMessage(std::string message, Client &client)
