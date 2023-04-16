@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 20:38:50 by vl-hotel          #+#    #+#             */
-/*   Updated: 2023/04/12 19:20:31 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/15 15:39:32 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,31 +66,6 @@ int main(int ac, char **av) {
 	// Gérer les commandes en appelant handle_command
 	return 0;
 }
-
-
-
-// /create nom_channel
-// Créé un nouveau channel avec pour nom nom_channel,
-// /join nom_channel
-// Rejoint le channel nom_channel,
-// /rename nom_channel nouveau_nom
-// Renomme le channel nom_channel en nouveau_nom,
-// /part nom_channel
-// Quitte le channel nom_channel,
-// /delete nom_channel
-// Supprime le channel nom_channel,
-// /nick nouveau_nom
-// Renomme l'utilisateur en nouveau_nom,
-// /users
-// Affiche la liste des utilisateurs connectés au channel / serveur,
-// /list [string]
-// Affiche la liste des channels disponibles. Si string est donné en paramètre, affiche la liste des channels contenant string dans leur nom,
-// /msg nom_utilisateur message
-// Envoie message à nom_utilisateur,
-// message
-// Envoie un message dans le channel courant.
-// kick un utilisateur
-// BAn un utilisateur
 
 // Le client se connecte au serveur IRC en utilisant une adresse IP et un port spécifiques. Le serveur écoute sur ce port et attend les connexions entrantes.
 

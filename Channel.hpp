@@ -9,9 +9,9 @@ class	Channel
 
 private:
 	std::string					_name; // name of the channel
-	std::map<Client, bool> 	    _users; // list of users, coupled with a boolean that is true if user is an operator
-    std::vector<std::string>    _userNicks;
-	int				            _maxUsers;
+	std::map<Client, bool>	_users; // list of users, coupled with a boolean that is true if user is an operator
+    std::vector<std::string>	_userNicks;
+	int							_maxUsers;
 	std::string					_topic;
 	std::vector<std::string>	_blacklist;
 	Channel( void );
@@ -19,10 +19,10 @@ private:
 public:
 	Channel( std::string name, Client &creator );
 	~Channel( void );
-    Channel &operator=(const Channel &other);
-    Channel (const Channel &other);
-    bool operator==(const Channel& other) const;
-    bool operator<(const Channel& other) const;
+	Channel &operator=(const Channel &other);
+	Channel (const Channel &other);
+	bool operator==(const Channel& other) const;
+	bool operator<(const Channel& other) const;
 
 	// Accessors
 	std::string 	getName( void ) const;

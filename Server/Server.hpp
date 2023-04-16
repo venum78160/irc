@@ -41,7 +41,9 @@ public:
 
 
 	// Commands
-	void	joinCommand( std::string channelName, Client &client );
+	void	ft_join(std::string message, Client &client);
+	void	joinChannel( std::string channelName, Client &client );
+
 	void	partCommand( std::string channelName, Client &client );
 	void	privMsgCommand( std::string command, Client &sender );
 	
