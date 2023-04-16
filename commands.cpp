@@ -43,8 +43,12 @@ void	Server::handleMessage(std::string message, Client &client)
 	}
 	else if (message.find("PRIVMSG") != std::string::npos && message.find("PRIVMSG") == 0)
 	{
-		
+        this->privMsgCommand(message, client);
 	}
+    else if (message.find("QUIT") != std::string::npos && message.find("QUIT") == 0)
+    {
+        this->quitCommand(client, message);
+    }
 }
 
 void Server::joinCommand(std::string channelName, Client &client)
@@ -180,3 +184,22 @@ void Server::partCommand(std::string channelName, Client &client)
     }
     // not found so send error
 }
+
+void Server::quitCommand(Client &client, std::string message)
+{
+    std::string quitMessage = message.substr(5);
+    std::string reply = ": " + client.GetNickname() + " QUIT :" + quitMessage + "\r\n";
+    send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+    for (size_t i = 0; i < client.GetChannels().size(); i++)
+    {
+        for (size_t j = 0; j < _channels.size(); j++)
+        {
+            if (_channels[j]->getName() == client.GetChannels()[i])
+            {
+                _channels[j]->removeUser(client);
+                break ;
+            }
+        }
+    }
+    this->removeClient(client.GetSocketFD());
+};
