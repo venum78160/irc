@@ -93,6 +93,7 @@ void Server::handleFirstConnection(int clientSocket)
 
 bool	Server::is_good_infos(std::string message, int clientSocket)
 {
+    std::cout << "Message = " << message << std::endl;
 	if (message.find("PASS") == std::string::npos) {
         std::string reply = ":127.0.0.1 461 * PASS :No password supplied\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);
