@@ -9,9 +9,9 @@ class	Channel
 
 private:
 	std::string					_name; // name of the channel
-	std::map<Client, bool> 	    _users; // list of users, coupled with a boolean that is true if user is an operator
-    std::vector<std::string>    _userNicks;
-	int				            _maxUsers;
+	std::map<Client, bool>		_users; // list of users, coupled with a boolean that is true if user is an operator
+    std::vector<std::string>	_userNicks;
+	int							_maxUsers;
 	std::string					_topic;
 	std::vector<std::string>	_blacklist;
 	Channel( void );
@@ -19,10 +19,12 @@ private:
 public:
 	Channel( std::string name, Client &creator );
 	~Channel( void );
-    Channel &operator=(const Channel &other);
-    Channel (const Channel &other);
-    bool operator==(const Channel& other) const;
-    bool operator<(const Channel& other) const;
+	Channel &operator=(const Channel &other);
+	Channel (const Channel &other);
+	bool operator==(const Channel& other) const;
+	bool operator<(const Channel& other) const;
+
+	// bool	checkNameValidity( std::string &name ); // checks if channel name is valid. should later be included in Server class as well
 
 	// Accessors
 	std::string 	getName( void ) const;
@@ -30,10 +32,7 @@ public:
 	int 			getUserLimit( void ) const;
 	void			setUserLimit( int limit );
 
-	bool	checkNameValidity( std::string &name ); // checks if channel name is valid. should later be included in Server class as well
-
-	void	broadcastMessage( std::string message, Client sender );
-	void	sendMessage( std::string message, Client const receiver );
+	int		getNbUsers( void ) const;
 
 	void	removeUser( Client user );
 	void	addUser( Client user );
@@ -44,6 +43,13 @@ public:
 	void		setTopic( std::string topic );
 	std::string	getTopic( void ) const;
 
+	std::vector<std::string>	getBlacklist( void ) const;
+
+	// Messages handling
+	void	broadcastMessage( std::string message, Client sender );
+	void	sendMessage( std::string message, Client const receiver );
+
+	// Exceptions
 	class	channelException : public std::exception
 	{
 	private:

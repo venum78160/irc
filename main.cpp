@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 20:38:50 by vl-hotel          #+#    #+#             */
-/*   Updated: 2023/04/08 18:14:45 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/15 15:39:32 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,59 +38,34 @@ void handle_command(std::string command, Client* sender, std::map<std::string, c
 
 int main(int ac, char **av) {
 
-    if (ac != 3)
-    {
-        std::cerr << "Usage: " << av[0] << " <port> <password>" << std::endl;
-        return 1;
-    }
+	if (ac != 3)
+	{
+		std::cerr << "Usage: " << av[0] << " <port> <password>" << std::endl;
+		return 1;
+	}
 	int port;
 	try // plutôt try et catch dans le main avant d'envoyer port au constructeur
-    {
-    	port = std::atoi(av[1]);
-    }
-    catch (const std::invalid_argument& e)
-    {
-        std::cerr << "Erreur : la chaîne n'est pas un entier valide." << std::endl;
+	{
+		port = std::atoi(av[1]);
+	}
+	catch (const std::invalid_argument& e)
+	{
+		std::cerr << "Erreur : la chaîne n'est pas un entier valide." << std::endl;
 		exit(1);
-    }
-    catch (const std::out_of_range& e)
-    {
-        std::cerr << "Erreur : la chaîne représente un entier en dehors de la plage de valeurs valides." << std::endl;
+	}
+	catch (const std::out_of_range& e)
+	{
+		std::cerr << "Erreur : la chaîne représente un entier en dehors de la plage de valeurs valides." << std::endl;
 		exit(1);
-    }
-    Server server(av[2], port);
+	}
+	Server server(av[2], port);
 
-    server.start();
-    // Gérer les connexions en appelant handle_new_connection
-    // Gérer les messages en appelant handle_client_message
-    // Gérer les commandes en appelant handle_command
-    return 0;
+	server.start();
+	// Gérer les connexions en appelant handle_new_connection
+	// Gérer les messages en appelant handle_client_message
+	// Gérer les commandes en appelant handle_command
+	return 0;
 }
-
-
-
-// /create nom_channel
-// Créé un nouveau channel avec pour nom nom_channel,
-// /join nom_channel
-// Rejoint le channel nom_channel,
-// /rename nom_channel nouveau_nom
-// Renomme le channel nom_channel en nouveau_nom,
-// /part nom_channel
-// Quitte le channel nom_channel,
-// /delete nom_channel
-// Supprime le channel nom_channel,
-// /nick nouveau_nom
-// Renomme l'utilisateur en nouveau_nom,
-// /users
-// Affiche la liste des utilisateurs connectés au channel / serveur,
-// /list [string]
-// Affiche la liste des channels disponibles. Si string est donné en paramètre, affiche la liste des channels contenant string dans leur nom,
-// /msg nom_utilisateur message
-// Envoie message à nom_utilisateur,
-// message
-// Envoie un message dans le channel courant.
-// kick un utilisateur
-// BAn un utilisateur
 
 // Le client se connecte au serveur IRC en utilisant une adresse IP et un port spécifiques. Le serveur écoute sur ce port et attend les connexions entrantes.
 

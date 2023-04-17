@@ -41,7 +41,10 @@ void Server::removeClient(int fd)
 			std::cout << "[removeClient] client : " << fd << " is disconnected" << std::endl;
             close(fd); // fermer le descripteur de fichier
             _pollFds.erase(it); // supprimer le pollfd de la liste
-            _MClient.erase(fd); // supprimer le client de la map
+			if (isClientAdded(fd) == true)
+			{
+            	_MClient.erase(fd); // supprimer le client de la map
+			}
             break;
         }
         ++it;
@@ -50,16 +53,11 @@ void Server::removeClient(int fd)
 
 void	Server::eventClient(Client *Client)
 {
-	char buffer[BUFFER_SIZE];
-    memset(buffer, 0, BUFFER_SIZE);
-	int bytes_read =recv(Client->GetSocketFD(), buffer, sizeof(buffer), 0);
-	if (buffer[bytes_read - 1] == '\n')
-        buffer[bytes_read - 1] = '\0';
-	std::cout << "bytes read = " << bytes_read<<" [event Client] Message reçu : " << buffer << "|" <<std::endl;
-	std::string message(buffer);
+	std::string message = recvAllData(Client->GetSocketFD());
 	std::cout << "[event Client] Message reçu : |" << message << "|" <<std::endl;
 	// Remplir le vecteur buffer_ de la classe Client avec le contenu de message
 	Client->SetBuffer(message);
+	// Client->printClientInfo();
 	this->handleMessage(message, *Client);
 	return ;
 }
@@ -102,5 +100,6 @@ int Server::checkNameValidity( std::string &name )
 	}
 	return (VALIDNAME);
 }
+
 
 // /connect server port password

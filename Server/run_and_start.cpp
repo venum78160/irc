@@ -18,6 +18,7 @@ void	Server::run()
             std::cerr << "Timeout while waiting for events" << std::endl;
             break;
         }
+		std::cout << "-------je suis apres dans le poll" << std::endl;
         // Parcours de la liste des descripteurs de fichiers surveillés
         for (size_t i = 0; i < _pollFds.size(); i++)
         {
@@ -39,15 +40,27 @@ void	Server::run()
 				handleFirstConnection(clientSocket);
 				if(isClientAdded(clientSocket) == true)
 				{
-					std::cout << "Client " << _MClient[clientSocket].GetNickname() << " ajouté." << std::endl;
-					_pollFds.push_back(clientPollFd);
+					std::cout << "Client " << _MClient[clientSocket].GetSocketFD() << " " << _MClient[clientSocket].GetNickname() << " ajouté." << std::endl;
 				}
+					_pollFds.push_back(clientPollFd);
 				continue;
             }
 			// Vérification si un événement s'est produit sur l'un des sockets des clients
 			else if (_pollFds[i].fd != _serverSocket && _pollFds[i].revents & POLLIN)
 			{
 				int fd_client = _pollFds[i].fd;
+				if(isClientAdded(fd_client) == false)
+				{
+					handleFirstConnection(fd_client);
+					if(isClientAdded(fd_client) == false)
+					{
+						std::cout << "Client " << fd_client << " destruct" << std::endl;
+						removeClient(fd_client);
+						continue;
+					}
+					std::cout << "Client " << _MClient[fd_client].GetSocketFD() << " " << _MClient[fd_client].GetNickname() << " ajouté 2." << std::endl;
+					continue;
+				}
 				eventClient(&_MClient[fd_client]);
                 if (_pollFds[i].revents & (POLLERR | POLLHUP))
                 {

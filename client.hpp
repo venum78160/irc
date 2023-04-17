@@ -39,6 +39,7 @@ public:
     void SetMode(const std::string& mode);
     void AddChannel(const std::string& channel);
     void RemoveChannel(const std::string& channel);
+	void printClientInfo();
 
 private:
 	std::vector<char> buffer_;
