@@ -34,6 +34,8 @@ public:
 
 	int		getNbUsers( void ) const;
 
+	std::map<Client, bool>	getUsers( void ) const;
+
 	void	removeUser( Client user );
 	void	addUser( Client user );
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/16 18:02:29 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/18 01:41:03 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,11 @@ bool Channel::operator==(const Channel& rhs) const
 int Channel::getNbUsers( void ) const
 {
 	return (this->_users.size());
+}
+
+std::map<Client, bool>	Channel::getUsers( void ) const
+{
+	return (this->_users);
 }
 
 std::vector<std::string> Channel::getBlacklist( void ) const

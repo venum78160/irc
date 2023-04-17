@@ -35,7 +35,7 @@ public:
 
 	int		checkNameValidity( std::string &name );
 	// void	handleRequestError( int error, Client &user ) const;
-	void	handleReplies( int code, std::string param, Client &client );
+	void	handleReplies( int code, std::string param, Channel *chan, Client &client );
 	bool	isClientAdded(int fd) const;
 	bool	is_good_infos(std::string message, int clientSocket);
 	
@@ -50,7 +50,7 @@ public:
 
 	void	partCommand( std::string channelName, Client &client );
 	void	privMsgCommand( std::string command, Client &sender );
-    void    quitCommand(Client &client);
+    void	quitCommand(Client &client, std::string message);
 	
 };
 

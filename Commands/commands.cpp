@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/16 17:28:42 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/18 01:11:07 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void	Server::handleMessage(std::string message, Client &client)
 	{
 		std::cout << "in join" << std::endl;
 		std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
-		this->joinCommand(channelName, client);
+		this->ft_join(channelName, client);
 	}
 }
 

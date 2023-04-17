@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   join.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 18:28:57 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/16 18:34:15 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/18 01:48:48 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,18 @@ bool	Server::joinErrors(Channel *channel, Client &client)
 	if (channel == nullptr)
 	{
 		// JOIN 0 means leave all channels
-		// remove user from all channels
+		for (size_t i = 0; i < client.GetChannels().size(); i++)
+		{
+			client.RemoveChannel(client.GetChannels()[i]);
+			for (size_t j = 0; j < _channels.size(); j++)
+			{
+				if (_channels[j]->getName() == client.GetChannels()[i])
+				{
+					_channels[j]->removeUser(client);
+					break ;
+				}
+			}
+		}
 		return (true);
 	}
 	// check if user is banned
@@ -116,14 +127,14 @@ bool	Server::joinErrors(Channel *channel, Client &client)
 	{
 		if (!(*it).compare(clientNick))
 		{
-			handleReplies(ERR_BANNEDFROMCHAN, channel->getName(), client);
+			handleReplies(ERR_BANNEDFROMCHAN, channel->getName(), nullptr, client);
 			return (true);
 		}
 	}
 	// check if channel is full
 	if (channel->getNbUsers() >= channel->getUserLimit())
 	{
-		handleReplies(ERR_CHANNELISFULL, channel->getName(), client);
+		handleReplies(ERR_CHANNELISFULL, channel->getName(), nullptr, client);
 		return (true);
 	}
 	return (false);
@@ -145,16 +156,19 @@ void	Server::joinChannel(Channel *channel, Client &client)
 	}
 	catch (const std::exception &e) // Channel is full - should never happen because of joinErrors
 	{
-		handleReplies(ERR_CHANNELISFULL, channel->getName(), client);
+		handleReplies(ERR_CHANNELISFULL, channel->getName(), nullptr, client);
 		return;
 	}
 	// reply sucessfully joined
 	// send client list of commands available
 	// send client topic of channel with RPL_TOPIC
 	// send client list of users in channel with RPL_NAMREPLY
-	std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName + + "\r\n";
-	send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
-	client.SetServername(channelName);
+	handleReplies(RPL_NAMREPLY, "", channel, client);
+	handleReplies(RPL_TOPIC, "", channel, client);
+	// std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName + + "\r\n";
+	// send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+	client.SetServername(channel->getName());
+	client.AddChannel(channel->getName());
 }
 
 void	Server::ft_join(std::string message, Client &client)
@@ -164,7 +178,7 @@ void	Server::ft_join(std::string message, Client &client)
 	std::vector<std::string> params = splitStr(message, ' ');
 	if (params.size() < 2) // check if there is enough params
 	{
-		handleReplies(ERR_NEEDMOREPARAMS, "join", client);
+		handleReplies(ERR_NEEDMOREPARAMS, "join", nullptr, client);
 		return ;
 	}
 

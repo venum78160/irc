@@ -67,19 +67,19 @@ bool Server::isClientAdded(int fd) const
     return _MClient.find(fd) != _MClient.end();
 }
 
-void Server::handleRequestError( int error, Client &user ) const
-{
-	std::string reply;
+// void Server::handleRequestError( int error, Client &user ) const
+// {
+// 	std::string reply;
 
-	if (error == NOTENOUGHPARAMS)
-		reply = ":127.0.0.1 461 " + user.GetNickname() + " :Not enough parameters\r\n";
-	else if (error == NAMETOOLONG)
-		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name too long\r\n";
-	else if (error == WRONGNAME)
-		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name contains illegal characters\r\n";
+// 	if (error == NOTENOUGHPARAMS)
+// 		reply = ":127.0.0.1 461 " + user.GetNickname() + " :Not enough parameters\r\n";
+// 	else if (error == NAMETOOLONG)
+// 		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name too long\r\n";
+// 	else if (error == WRONGNAME)
+// 		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name contains illegal characters\r\n";
 
-	send(user.GetSocketFD(), reply.c_str(), reply.size(), 0);
-}
+// 	send(user.GetSocketFD(), reply.c_str(), reply.size(), 0);
+// }
 
 int Server::checkNameValidity( std::string &name )
 {

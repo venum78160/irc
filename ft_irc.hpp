@@ -29,6 +29,7 @@
 
 // REPLIES CODES
 #define RPL_TOPIC 332
+#define RPL_NAMREPLY 353
 
 // ERROR CODES
 #define NAMETOOLONG 0
@@ -56,4 +57,5 @@ std::vector<std::string> split(const std::string& s, char delimiter);
 bool parseClientInfo(std::string& message, std::string& password, std::string& nickname, std::string& username);
 void removeNewlinesAndDoubleSpaces(std::string& str);
 
-void	errReplies( int code, std::string param, Client &client );
+void 						handleReplies( int code, std::string param, Client &client );
+std::vector<std::string> 	splitStr( std::string str, char sep );
