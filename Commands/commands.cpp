@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 17:03:11 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/18 17:47:57 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,41 +70,6 @@ void	Server::handleMessage(std::string message, Client &client)
 		// std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
 		this->ft_join(message, client);
 	}
-}
-
-
-
-void	Server::privMsgCommand( std::string command, Client &sender )
-{
-	Client						target;
-	std::string 				targetNick;
-	std::string					message;
-	std::vector<std::string> 	args = splitStr(command, ' ');
-
-	if (command.find("PRIVMSG") == std::string::npos || command.size() < 9) // function protection, although it should never be verified
-		return ;
-	if (args.size() < 3)
-	{
-		// send error message about wrong input
-		return ;
-	}
-	targetNick = args[1]; // retrieving target's nickname from the command
-	
-	std::map<int, Client>::iterator it;
-	std::map<int, Client>::iterator ite = _MClient.end(); // retrieving target and making sure it exists
-	for (it = _MClient.begin(); it != ite; *it++)
-		if ((it->second).GetNickname() == targetNick)
-		{
-			target = it->second;
-			break ;
-		}
-	if (it == ite) // in case target doesn't exist
-	{
-		// send error message about non-existent user
-		return ;
-	}
-	message = sender.getFullId() + " " + command;
-	send(target.GetSocketFD(), &message, sizeof(message), 0);
 }
 
 void Server::partCommand(std::string channelName, Client &client)

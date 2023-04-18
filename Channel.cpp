@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 17:05:39 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/18 17:46:41 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,7 +158,7 @@ int Channel::getNbUsers( void ) const
 	return (this->_users.size());
 }
 
-std::map<Client, bool>	Channel::getUsers( void ) const
+std::map<Client, bool>	const &Channel::getUsers( void ) const
 {
 	return (this->_users);
 }
@@ -170,5 +170,5 @@ std::vector<std::string> Channel::getBlacklist( void ) const
 
 bool Channel::operator<(const Channel& rhs) const
 {
-    return (this->_name < rhs._name);
+	return (this->_name < rhs._name);
 }

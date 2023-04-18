@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 15:36:34 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 16:41:43 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/18 17:47:33 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,4 +38,3 @@ std::vector<std::string> splitStr( std::string str, char sep )
 	}
 	return (ret);
 }
-

@@ -42,14 +42,15 @@ public:
 
 
 	// Commands
+	void	createChannel( std::string channelName, Client &client );
 	void	ft_join(std::string message, Client &client);
 	bool	joinErrors(Channel *channel, Client &client);
 	void	joinChannel( Channel *channel, Client &client );
 
-	void	createChannel( std::string channelName, Client &client );
+	void	sendprivMsg( std::string command, Client &sender );
+	void	ft_privMsg( std::string message, Client &client );
 
 	void	partCommand( std::string channelName, Client &client );
-	void	privMsgCommand( std::string command, Client &sender );
     void	quitCommand(Client &client, std::string message);
 	
 };
