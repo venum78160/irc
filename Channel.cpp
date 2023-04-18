@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 01:41:03 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/18 17:05:39 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,8 @@ Channel &Channel::operator=(const Channel &other)
 
 int Channel::getUserLimit( void ) const
 {
-	if (this->_maxUsers == -1)
-		throw (channelException("No user limit set"));
+	// if (this->_maxUsers == -1)
+	// 	throw (channelException("No user limit set"));
 	return (this->_maxUsers);
 }
 

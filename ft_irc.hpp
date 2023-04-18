@@ -57,5 +57,6 @@ std::vector<std::string> split(const std::string& s, char delimiter);
 bool parseClientInfo(std::string& message, std::string& password, std::string& nickname, std::string& username);
 void removeNewlinesAndDoubleSpaces(std::string& str);
 
-void 						handleReplies( int code, std::string param, Client &client );
+// void 						handleReplies( int code, std::string param, Client &client );
 std::vector<std::string> 	splitStr( std::string str, char sep );
+std::string					ft_itoa( int number );

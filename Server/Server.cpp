@@ -84,11 +84,6 @@ bool Server::isClientAdded(int fd) const
 int Server::checkNameValidity( std::string &name )
 {
 	int	nameLen = name.size();
-	for (size_t i = 0; i < _channels.size(); i++)
-	{
-		if (_channels[i]->getName() == name)
-			return (CHANNELALREADYEXISTS);
-	}
 	if (nameLen > 50)
 		return (NAMETOOLONG);
 	if (name[0] != '#')

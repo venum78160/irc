@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   join.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 18:28:57 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 01:48:48 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/18 17:31:53 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,27 +75,13 @@
 // 	send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 // }
 
-int Server::checkNameValidity( std::string &name )
-{
-	int	nameLen = name.size();
-	if (nameLen > 50)
-		return (NAMETOOLONG);
-	if (name[0] != '#')
-		return (NOTENOUGHPARAMS);
-	for (int i = 0; i < nameLen; i++)
-	{
-		if (isspace(name[i]) || name[i] == ',' || name[i] == 7)
-			return (WRONGNAME);
-	}
-	return (VALIDNAME);
-}
-
 void	Server::createChannel(std::string channelName, Client &client)
 {
 	
 	Channel *newChannel = new Channel(channelName, client);
 	newChannel->addUser(client);
 	_channels.push_back(newChannel);
+	std::cout << "Channel successfully created: " << channelName << std::endl; // test only, to delete later
 	joinChannel(newChannel, client);
 }
 
@@ -132,7 +118,7 @@ bool	Server::joinErrors(Channel *channel, Client &client)
 		}
 	}
 	// check if channel is full
-	if (channel->getNbUsers() >= channel->getUserLimit())
+	if (channel->getUserLimit() > -1 && channel->getNbUsers() >= channel->getUserLimit())
 	{
 		handleReplies(ERR_CHANNELISFULL, channel->getName(), nullptr, client);
 		return (true);
@@ -150,34 +136,31 @@ void	Server::joinChannel(Channel *channel, Client &client)
 	if (joinErrors(channel, client))
 		return ;
 
-	try
-	{
-		channel->addUser(client);
-	}
-	catch (const std::exception &e) // Channel is full - should never happen because of joinErrors
-	{
-		handleReplies(ERR_CHANNELISFULL, channel->getName(), nullptr, client);
-		return;
-	}
-	// reply sucessfully joined
-	// send client list of commands available
-	// send client topic of channel with RPL_TOPIC
-	// send client list of users in channel with RPL_NAMREPLY
-	handleReplies(RPL_NAMREPLY, "", channel, client);
-	handleReplies(RPL_TOPIC, "", channel, client);
-	// std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName + + "\r\n";
-	// send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+	channel->addUser(client);
+
+	/* reply sucessfully joined :
+	- send client list of commands available
+	- send client topic of channel with RPL_TOPIC
+	- send client list of users in channel with RPL_NAMREPLY */
 	client.SetServername(channel->getName());
 	client.AddChannel(channel->getName());
+	std::cout << "Channel successfully joined: " << channel->getName() << std::endl; // test only, to delete later
+
+	// std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName + + "\r\n";
+	// send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+	handleReplies(RPL_NAMREPLY, "", channel, client);
+	handleReplies(RPL_TOPIC, "", channel, client);
 }
 
 void	Server::ft_join(std::string message, Client &client)
 {
 	std::transform(message.begin(), message.end(), message.begin(), ::tolower);
 
+	std::cout << "join message: " << message << std::endl; // test only, to delete later
 	std::vector<std::string> params = splitStr(message, ' ');
 	if (params.size() < 2) // check if there is enough params
 	{
+		std::cout << "not enough params" << std::endl; // test only, to delete later
 		handleReplies(ERR_NEEDMOREPARAMS, "join", nullptr, client);
 		return ;
 	}
@@ -189,6 +172,7 @@ void	Server::ft_join(std::string message, Client &client)
 	for (it = channels.begin(); it != ite; it++) // join each channel
 	{
 		std::string channelName = *it;
+		std::cout << "testing channel: " << channelName << std::endl; // test only, to delete later
 		if (!channelName.compare("0"))
 		{
 			joinChannel(nullptr, client);
@@ -206,6 +190,9 @@ void	Server::ft_join(std::string message, Client &client)
 			}
 		}
 		if (it2 == ite2) // channel doesn't exist so we create it
+		{
+			std::cout << "creating channel: " << channelName << std::endl; // test only, to delete later
 			createChannel(channelName, client);
+		}
 	}
 }

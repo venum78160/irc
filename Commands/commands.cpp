@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 01:11:07 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/18 17:03:11 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,22 +44,7 @@
 
 #include "../ft_irc.hpp"
 
-std::vector<std::string> splitStr( std::string str, char sep )
-{
-	size_t					  begin;
-	size_t					  end = 0;
-	std::vector<std::string>	ret;
 
-	begin = str.find_first_not_of(sep, end);
-	while (begin != std::string::npos)
-	{
-		end = str.find(sep, begin);
-		std::string newStr = str.substr(begin, end - begin);
-		ret.push_back(newStr);
-		begin = str.find_first_not_of(sep, end);
-	}
-	return (ret);
-}
 
 // void Server::handleRequestError( int error, Client &user ) const
 // {
@@ -82,8 +67,8 @@ void	Server::handleMessage(std::string message, Client &client)
 	if (message.find("JOIN") != std::string::npos && message.find("JOIN") == 0)
 	{
 		std::cout << "in join" << std::endl;
-		std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
-		this->ft_join(channelName, client);
+		// std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
+		this->ft_join(message, client);
 	}
 }
 
@@ -178,4 +163,5 @@ void Server::quitCommand(Client &client, std::string message)
         }
     }
     this->removeClient(client.GetSocketFD());
+	std::cout << "Successfully quitted " << std::endl; // test only, to delete later
 }

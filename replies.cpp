@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   replies.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/16 15:48:48 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 01:44:37 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/18 17:38:56 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,23 @@
 
 #include "ft_irc.hpp"
 
-void	successReplies( int code, Channel *param, std::string &reply )
+void	successReplies( int code, Channel &param, std::string &reply )
 {
 	if (code == RPL_TOPIC)
 	{
-		std::string chan = param->getName();
-		std::string topic = param->getTopic();
+		std::string chan = param.getName();
+		std::string topic = param.getTopic();
 		reply.append(chan + " :" + topic + "\r\n");
 	}
 	else if (code == RPL_NAMREPLY)
 	{
-		std::string chan = param->getName();
+		std::string chan = param.getName();
 		reply.append(chan + " :");
+		std::map<Client, bool> users = param.getUsers();
 		std::map<Client, bool>::iterator it;
-		std::map<Client, bool>::iterator ite = (param->getUsers().end());
-		for (it = param->getUsers().begin(); it != ite; *it++)
+		std::map<Client, bool>::iterator ite = (users.end());
+		// look through users and append each user's nickname to reply
+		for (it = users.begin(); it != ite; it++)
 		{
 			if (it->second == true)
 				reply.append(" @" + it->first.GetNickname());
@@ -70,13 +72,13 @@ void	sendReply( Client &client, std::string reply )
 
 void	Server::handleReplies( int code, std::string param, Channel *chan, Client &client )
 {
-	std::string reply = ":127.0.0.1 " + itoa(code) + " " + client.GetNickname() + " ";
+	std::string reply = ":127.0.0.1 " + ft_itoa(code) + " " + client.GetNickname() + " ";
 	if (code == 403 || code == 405 || code == 471 || code == 473 ||
 	code == 474 || code == 475)
 		channelErrors(code, param, reply);
 	else if (code == 461)
 		parsingErrors(code, param, reply);
 	else if (code == RPL_TOPIC || code == RPL_NAMREPLY)
-		successReplies(code, chan, reply);
+		successReplies(code, *chan, reply);
 	sendReply(client, reply);
 }
