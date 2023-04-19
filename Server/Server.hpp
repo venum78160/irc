@@ -46,14 +46,16 @@ public:
 
 	// Commands
 	void	createChannel( std::string channelName, Client &client );
-	void	ft_join(std::string message, Client &client);
 	bool	joinErrors(Channel *channel, Client &client);
 	void	joinChannel( Channel *channel, Client &client );
+	void	ft_join(std::string message, Client &client);
+
     void    executeModeChannels(Client &client, std::vector<std::string> &params);
     void    executeModeUsers(Client &client, std::vector<std::string> &params);
     Channel *getChannelByName(std::string channelName);
 
-	void	sendprivMsg( std::string command, Client &sender );
+	void	notifyChannel( std::string channelName, std::string &msg, Client &sender );
+	void	sendPrivMsg( std::string targetNick, std::string command );
 	void	ft_privMsg( std::string message, Client &client );
 
 	void	partCommand( std::string channelName, Client &client );
