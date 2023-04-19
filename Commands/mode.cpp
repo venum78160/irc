@@ -119,7 +119,9 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
     }
 }
 
-void Server::executeModeUsers(Client &client, std::string &params)
+void Server::executeModeUsers(Client &client, std::vector<std::string> &params)
 {
-    return
+    (void)client;
+    (void)params;
+    return ;
 }
