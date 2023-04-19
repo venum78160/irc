@@ -171,7 +171,7 @@ void Server::modeCommand(Client &client, std::string message)
                 send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                 return ;
             }
-            //executeModeUsers(client, tab);
+            executeModeUsers(client, tab);
         }
     }
 

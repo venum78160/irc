@@ -192,3 +192,8 @@ void Channel::removeToBlacklist(std::string nickname)
 {
     this->_blacklist.erase(std::remove(this->_blacklist.begin(), this->_blacklist.end(), nickname), this->_blacklist.end());
 }
+
+bool Channel::isInBlacklist(std::string nickname)
+{
+    return (std::find(this->_blacklist.begin(), this->_blacklist.end(), nickname) != this->_blacklist.end());
+}

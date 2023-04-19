@@ -27,7 +27,7 @@ public:
 
 	std::vector<Channel *>	getServerChannels();
 	Client 					getClientbyFd(int fd);
-    Client                  getClientByNickname(std::string nickname);
+    Client                  &getClientByNickname(std::string nickname);
 
 	void		handleMessage(std::string message, Client &client);
 	void 		handleFirstConnection(int clientSocket);
