@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 17:47:57 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/20 01:21:31 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,17 @@ void	Server::handleMessage(std::string message, Client &client)
 		// std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
 		this->ft_join(message, client);
 	}
-    if (message.find("MODE") != std::string::npos && message.find("MODE") == 0)
-    {
-        std::cout << "in mode" << std::endl;
-        this->modeCommand(client, message);
-    }
+    if (message.find("PRIVMSG") != std::string::npos && message.find("PRIVMSG") == 0)
+	{
+		std::cout << "in privmsg" << std::endl;
+		std::string privmsg = message.substr(message.find("PRIVMSG") + 8, message.size()); // attention au segfault
+		this->ft_privMsg(privmsg, client);
+	}
+    // if (message.find("MODE") != std::string::npos && message.find("MODE") == 0)
+    // {
+    //     std::cout << "in mode" << std::endl;
+    //     this->modeCommand(client, message);
+    // }
     if (message.find("PING") != std::string::npos && message.find("PING") == 0)
     {
         std::cout << "in ping" << std::endl;

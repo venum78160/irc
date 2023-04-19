@@ -38,8 +38,11 @@
 #define CHANNELALREADYEXISTS 3
 #define VALIDNAME 4
 
+#define ERR_NOSUCHNICK 401
 #define ERR_NOSUCHCHANNEL 403
 #define ERR_TOOMANYCHANNELS 405
+#define ERR_NORECIPIENT 411
+#define ERR_NOTEXTTOSEND 412
 #define ERR_NEEDMOREPARAMS 461
 #define ERR_CHANNELISFULL 471
 #define ERR_INVITEONLYCHAN 473
@@ -59,3 +62,4 @@ void removeNewlinesAndDoubleSpaces(std::string& str);
 
 std::vector<std::string> 	splitStr( std::string str, char sep );
 std::string					ft_itoa( int number );
+std::vector<std::string> 	splitOnFirstSpace( std::string str );

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   replies.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/16 15:48:48 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 17:38:56 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/20 01:08:31 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,12 @@ void	parsingErrors( int code, std::string &param, std::string &reply )
 {
 	if (code == 461)
 		reply.append(param + ":Not enough parameters\r\n");
+	else if (code == ERR_NORECIPIENT)
+		reply.append(":No recipient given");
+	else if (code == ERR_NOSUCHNICK)
+		reply.append(param + ":No such nick/channel");
+	else if (code == ERR_NOTEXTTOSEND)
+		reply.append(":No text to send");
 }
 
 void	sendReply( Client &client, std::string reply )
@@ -70,15 +76,15 @@ void	sendReply( Client &client, std::string reply )
 }
 
 
-void	Server::handleReplies( int code, std::string param, Channel *chan, Client &client )
+void	Server::handleReplies( int code, std::string param, Channel *chan, Client &target )
 {
-	std::string reply = ":127.0.0.1 " + ft_itoa(code) + " " + client.GetNickname() + " ";
+	std::string reply = ":127.0.0.1 " + ft_itoa(code) + " " + target.GetNickname() + " ";
 	if (code == 403 || code == 405 || code == 471 || code == 473 ||
 	code == 474 || code == 475)
 		channelErrors(code, param, reply);
-	else if (code == 461)
+	else if (code == 461 || code == ERR_NOSUCHNICK || code == ERR_NOTEXTTOSEND || code == ERR_NORECIPIENT)
 		parsingErrors(code, param, reply);
 	else if (code == RPL_TOPIC || code == RPL_NAMREPLY)
 		successReplies(code, *chan, reply);
-	sendReply(client, reply);
+	sendReply(target, reply);
 }

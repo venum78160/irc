@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 16:23:42 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/20 00:34:26 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/20 01:39:57 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@
 // 	send(target.GetSocketFD(), &message, sizeof(message), 0);
 // }
 
-void	Server::sendPrivMsg( std::string targetNick, std::string message )
+void	Server::sendPrivMsg( std::string targetNick, std::string message, Client &sender )
 {
 	Client	*target = nullptr;
 	std::map<int , Client>::iterator it;
@@ -61,7 +61,7 @@ void	Server::sendPrivMsg( std::string targetNick, std::string message )
 	}
 	if (it == ite || target == nullptr) // no such client
 	{
-		// send error
+		handleReplies(ERR_NOSUCHNICK, targetNick, NULL, sender);
 		return ;
 	}
 	send(target->GetSocketFD(), &message, sizeof(message), 0);
@@ -83,7 +83,7 @@ void	Server::notifyChannel( std::string channelName, std::string &msg, Client &s
 	}
 	if (it == ite || targetChannel == nullptr) // channel not found
 	{
-		// send error
+		handleReplies(ERR_NOSUCHNICK, channelName, NULL, sender);
 		return ;
 	}
 	
@@ -92,29 +92,28 @@ void	Server::notifyChannel( std::string channelName, std::string &msg, Client &s
 
 void	Server::ft_privMsg( std::string command, Client &sender )
 {
-	std::transform(command.begin(), command.end(), command.begin(), ::tolower);
-
-	// std::cout << "privmsg message: " << command << std::endl; // test only, to delete later
-	std::vector<std::string> params = splitStr(command, ' ');
-	if (params.size() < 2) // check if there is enough params
+	std::cout << "privmsg message: " << command << std::endl; // test only, to delete later
+	if (command.find(" ") == std::string::npos)
 	{
-		// std::cout << "not enough params" << std::endl; // test only, to delete later
-		handleReplies(ERR_NEEDMOREPARAMS, "join", NULL, sender);
+		handleReplies(ERR_NORECIPIENT, "privmsg", NULL, sender);
 		return ;
 	}
-	std::string message = params.back();
-	// FORMATER LE MESSAGE !!!
-	std::vector<std::string> targets = splitStr(params[1], ','); // split targets in case there is more than one
-	std::vector<std::string>::iterator it;
-	std::vector<std::string>::iterator ite = targets.end();
-
-	for (it = targets.begin(); it != ite; it++)
+	std::vector<std::string> params = splitOnFirstSpace(command);
+	if (params.size() < 2) // check if there is enough params, there should be 2: first is target second is message
 	{
-		// check validity of target
-		// checkValidity(*it);
-		if ((*it)[0] == '#')
-			notifyChannel(*it, message, sender);
-		else
-			sendPrivMsg(*it, message);
+		handleReplies(ERR_NOTEXTTOSEND, "privmsg", NULL, sender);
+		return ;
 	}
+	std::string senderNick = sender.GetNickname();
+	std::string	senderUser = sender.GetUsername();
+	std::string message = ":" + senderNick + "!" + senderUser + "@HOST ";
+	message.append(params.back() + "\r\n");
+	std::string target = params[0];
+
+	// check validity of target
+	// checkValidity(target);
+	if (target[0] == '#')
+		notifyChannel(target, message, sender);
+	else
+		sendPrivMsg(target, message, sender);
 }
