@@ -38,6 +38,8 @@ public:
 
 	void	removeUser( Client user );
 	void	addUser( Client user );
+    void    addToBlacklist(std::string nickname);
+    void    removeToBlacklist(std::string nickname);
 
 	void	giveOpRights( Client user );
 	void	removeOpRights( Client user );

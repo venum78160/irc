@@ -87,7 +87,7 @@ void	Server::createChannel(std::string channelName, Client &client)
 
 bool	Server::joinErrors(Channel *channel, Client &client)
 {
-	if (channel == nullptr)
+	if (channel == NULL)
 	{
 		// JOIN 0 means leave all channels
 		for (size_t i = 0; i < client.GetChannels().size(); i++)
@@ -113,14 +113,14 @@ bool	Server::joinErrors(Channel *channel, Client &client)
 	{
 		if (!(*it).compare(clientNick))
 		{
-			handleReplies(ERR_BANNEDFROMCHAN, channel->getName(), nullptr, client);
+			handleReplies(ERR_BANNEDFROMCHAN, channel->getName(), NULL, client);
 			return (true);
 		}
 	}
 	// check if channel is full
 	if (channel->getUserLimit() > -1 && channel->getNbUsers() >= channel->getUserLimit())
 	{
-		handleReplies(ERR_CHANNELISFULL, channel->getName(), nullptr, client);
+		handleReplies(ERR_CHANNELISFULL, channel->getName(), NULL, client);
 		return (true);
 	}
 	return (false);
@@ -161,7 +161,7 @@ void	Server::ft_join(std::string message, Client &client)
 	if (params.size() < 2) // check if there is enough params
 	{
 		std::cout << "not enough params" << std::endl; // test only, to delete later
-		handleReplies(ERR_NEEDMOREPARAMS, "join", nullptr, client);
+		handleReplies(ERR_NEEDMOREPARAMS, "join", NULL, client);
 		return ;
 	}
 
@@ -175,7 +175,7 @@ void	Server::ft_join(std::string message, Client &client)
 		std::cout << "testing channel: " << channelName << std::endl; // test only, to delete later
 		if (!channelName.compare("0"))
 		{
-			joinChannel(nullptr, client);
+			joinChannel(NULL, client);
 			return ;
 		}
 		// check if channel exists

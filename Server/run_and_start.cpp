@@ -42,7 +42,7 @@ void	Server::run()
 				{
 					std::cout << "Client " << _MClient[clientSocket].GetSocketFD() << " " << _MClient[clientSocket].GetNickname() << " ajouté." << std::endl;
 				}
-					_pollFds.push_back(clientPollFd);
+                _pollFds.push_back(clientPollFd);
 				continue;
             }
 			// Vérification si un événement s'est produit sur l'un des sockets des clients

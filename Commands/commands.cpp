@@ -70,6 +70,17 @@ void	Server::handleMessage(std::string message, Client &client)
 		// std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
 		this->ft_join(message, client);
 	}
+    if (message.find("MODE") != std::string::npos && message.find("MODE") == 0)
+    {
+        std::cout << "in mode" << std::endl;
+        this->modeCommand(client, message);
+    }
+    if (message.find("PING") != std::string::npos && message.find("PING") == 0)
+    {
+        std::cout << "in ping" << std::endl;
+        std::string reply = "PONG " + message.substr(5);
+        send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+    }
 }
 
 void Server::partCommand(std::string channelName, Client &client)
@@ -129,4 +140,41 @@ void Server::quitCommand(Client &client, std::string message)
     }
     this->removeClient(client.GetSocketFD());
 	std::cout << "Successfully quitted " << std::endl; // test only, to delete later
+}
+
+void Server::modeCommand(Client &client, std::string message)
+{
+    std::vector<std::string> tab = split(message, ' ');
+    // check if format is MODE #channel or nickname modechars modeparams
+    if (tab.size() < 3)
+        std::string reply = ": " + client.GetNickname() + " 461 " + client.GetNickname() + " :Not enough parameters\r\n";
+    else
+    {
+        // check if first param is a channel or a nickname
+        if (tab[1][0] == '#')
+        {
+            // we are in channel
+            if (!channelExist(tab[1]))
+            {
+                std::string reply = ": " + client.GetNickname() + " 403 " + client.GetNickname() + " :No such channel\r\n";
+                send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+                return ;
+            }
+            executeModeChannels(client, tab);
+        }
+        else
+        {
+            // we are in nickname
+            if (!nicknameExist(tab[1]))
+            {
+                std::string reply = ": " + client.GetNickname() + " 401 " + client.GetNickname() + " :No such nick/channel\r\n";
+                send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+                return ;
+            }
+            //executeModeUsers(client, tab);
+        }
+    }
+
+
+
 }

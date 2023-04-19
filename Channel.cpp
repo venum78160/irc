@@ -107,7 +107,12 @@ void Channel::addUser( Client user )
 	if (static_cast<int>(this->_users.size()) == this->_maxUsers)
 		throw (channelException("Channel is at full capacity."));
 	
-	std::pair<Client, bool> newUser(user, false);
+	for (size_t i = 0; i < this->_blacklist.size(); i++)
+    {
+        if (this->_blacklist[i] == user.GetUsername())
+            throw (channelException("You are banned from this channel."));
+    }
+    std::pair<Client, bool> newUser(user, false);
 	(this->_users).insert(newUser);
 }
 
@@ -171,4 +176,19 @@ std::vector<std::string> Channel::getBlacklist( void ) const
 bool Channel::operator<(const Channel& rhs) const
 {
 	return (this->_name < rhs._name);
+}
+
+void Channel::addToBlacklist(std::string nickname)
+{
+    for (size_t i = 0; i < this->_blacklist.size(); i++) // check if already in blacklist
+    {
+        if (this->_blacklist[i] == nickname)
+            return ;
+    }
+    this->_blacklist.push_back(nickname);
+}
+
+void Channel::removeToBlacklist(std::string nickname)
+{
+    this->_blacklist.erase(std::remove(this->_blacklist.begin(), this->_blacklist.end(), nickname), this->_blacklist.end());
 }

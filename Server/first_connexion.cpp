@@ -64,9 +64,10 @@ std::string Server::recvAllData(int clientSocket)
     do {
         memset(buffer, 0, BUFFER_SIZE);
         bytes_read = recv(clientSocket, buffer, BUFFER_SIZE, 0);
-        if (bytes_read == -1) {
+        if (bytes_read == -1 || bytes_read == 0) {
             std::cerr << "Error receiving data from client " << clientSocket << std::endl;
-            return "";
+            removeClient(clientSocket);
+            return "DISCONNECTED";
         }
         data += buffer;
     } while (bytes_read == BUFFER_SIZE);
@@ -76,17 +77,18 @@ std::string Server::recvAllData(int clientSocket)
 
 void Server::handleFirstConnection(int clientSocket)
 {
-   //recv NICK and PASS and then reply with good format
-   std::cout << "[handleconnection] :" << clientSocket << "|" << std::endl;
-	std::string message = recvAllData(clientSocket);
-	std::cout << "Message reçu : |" << message << "|" <<std::endl;
-	if (is_good_infos(message, clientSocket) == false)
-		return;
-	std::string password, nickname, username;
-	parseClientInfo(message, password, nickname, username);
-	std::cout << "password = " << password << ", nickname = " << nickname << ", username = " << username << std::endl;
-
-	if (password == _password)
+    //recv NICK and PASS and then reply with good format
+    std::cout << "[handleconnection] :" << clientSocket << "|" << std::endl;
+    std::string message = recvAllData(clientSocket);
+    if (message == "DISCONNECTED")
+        return ;
+    std::cout << "Message reçu : |" << message << "|" <<std::endl;
+    if (is_good_infos(message, clientSocket) == false)
+        return;
+    std::string password, nickname, username;
+    parseClientInfo(message, password, nickname, username);
+    std::cout << "password = " << password << ", nickname = " << nickname << ", username = " << username << std::endl;
+    if (password == _password)
     {
         for (std::map<int, Client>::iterator it = _MClient.begin(); it != _MClient.end(); ++it)
         {
@@ -99,7 +101,7 @@ void Server::handleFirstConnection(int clientSocket)
         }
         //inserer le client dans la map
         _MClient.insert(std::make_pair(clientSocket, Client()));
-		_MClient[clientSocket].SetSock_fd(clientSocket);
+        _MClient[clientSocket].SetSock_fd(clientSocket);
         _MClient[clientSocket].SetNickname(nickname);
         _MClient[clientSocket].SetUsername(username);
         _MClient[clientSocket].SetServername("");
