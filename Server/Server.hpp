@@ -58,6 +58,8 @@ public:
 	void	sendPrivMsg( std::string targetNick, std::string command, Client &sender );
 	void	ft_privMsg( std::string message, Client &client );
 
+	void	ft_kick( std::string command, Client &sender );
+
 	void	partCommand( std::string channelName, Client &client );
     void	quitCommand(Client &client, std::string message);
     void    modeCommand(Client &client, std::string message);

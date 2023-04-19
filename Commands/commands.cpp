@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/20 01:21:31 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/20 01:43:37 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,23 +43,6 @@
 // BAn un utilisateur
 
 #include "../ft_irc.hpp"
-
-
-
-// void Server::handleRequestError( int error, Client &user ) const
-// {
-// 	std::string reply;
-
-// 	if (error == NOTENOUGHPARAMS)
-// 		reply = ":127.0.0.1 461 " + user.GetNickname() + " :Not enough parameters\r\n";
-// 	else if (error == NAMETOOLONG)
-// 		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name too long\r\n";
-// 	else if (error == WRONGNAME)
-// 		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name contains illegal characters\r\n";
-
-// 	send(user.GetSocketFD(), reply.c_str(), reply.size(), 0);
-// }
-
 
 void	Server::handleMessage(std::string message, Client &client)
 {
@@ -180,7 +163,5 @@ void Server::modeCommand(Client &client, std::string message)
             executeModeUsers(client, tab);
         }
     }
-
-
-
 }
+
