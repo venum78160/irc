@@ -150,8 +150,7 @@ void Server::executeModeUsers(Client &client, std::vector<std::string> &params)
 {
     Client &user = getClientByNickname(params[1]);
     Channel *channel = getChannelByName(user.GetServername());
-    (void)client;
-    (void)channel;
+    std::map<Client, bool> users = channel->getUsers();
     if (params[2][0] != '+' && params[2][0] != '-')
         return ;
     if (params[2].size() - 1 != params.size() - 3)
@@ -162,17 +161,39 @@ void Server::executeModeUsers(Client &client, std::vector<std::string> &params)
         {
             if (params[2][i] == 'o')
             {
-
-            }
-            if (params[2][i] == 'a')
-            {
-
+                if (users[client] == true)
+                {
+                    channel->giveOpRights(user);
+                    std::string reply = ": 324 " + client.GetNickname() + " " + channel->getName() + " +o\r\n";
+                    send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+                }
+                else
+                {
+                    std::string reply = ": 482 " + client.GetNickname() + " :You're not channel operator\r\n";
+                    send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+                }
             }
         }
     }
     else
     {
-
+        for (size_t i = 1; i < params[2].size(); i++)
+        {
+            if (params[2][i] == 'o')
+            {
+                if (users[client] == true)
+                {
+                    channel->removeOpRights(user);
+                    std::string reply = ": 324 " + client.GetNickname() + " " + channel->getName() + " +o\r\n";
+                    send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+                }
+                else
+                {
+                    std::string reply = ": 482 " + client.GetNickname() + " :You're not channel operator\r\n";
+                    send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+                }
+            }
+        }
     }
     return ;
 }
