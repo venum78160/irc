@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 15:36:34 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/20 01:18:50 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/20 15:54:53 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ std::vector<std::string> splitOnFirstSpace( std::string str )
 	firstSpace = str.find_first_of(" ");
 	if (firstSpace != std::string::npos)
 	{
-		ret.push_back(str.substr(firstSpace, firstSpace + 1));
+		ret.push_back(str.substr(0, firstSpace));
 		ret.push_back(str.substr(firstSpace + 1, strLen - firstSpace));
 	}
 	return (ret);

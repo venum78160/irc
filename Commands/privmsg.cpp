@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 16:23:42 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/20 01:39:57 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/20 19:17:41 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,13 @@
 // 	send(target.GetSocketFD(), &message, sizeof(message), 0);
 // }
 
-void	Server::sendPrivMsg( std::string targetNick, std::string message, Client &sender )
+void	Server::sendPrivMsg( std::string targetNick, std::string &message, Client &sender )
 {
 	Client	*target = NULL;
 	std::map<int , Client>::iterator it;
 	std::map<int , Client>::iterator ite = _MClient.end();
+
+	std::cout << "targetNick = " << targetNick << " and message = " << message << std::endl;
 
 	for (it = _MClient.begin(); it != ite; it++)
 	{
@@ -64,7 +66,8 @@ void	Server::sendPrivMsg( std::string targetNick, std::string message, Client &s
 		handleReplies(ERR_NOSUCHNICK, targetNick, NULL, sender);
 		return ;
 	}
-	send(target->GetSocketFD(), &message, sizeof(message), 0);
+	std::cout << "SENDING FOLLOWING MESSAGE: [" << message << "]" << std::endl;
+	send(target->GetSocketFD(), message.c_str(), message.size(), 0);
 }
 
 void	Server::notifyChannel( std::string channelName, std::string &msg, Client &sender )
@@ -92,7 +95,7 @@ void	Server::notifyChannel( std::string channelName, std::string &msg, Client &s
 
 void	Server::ft_privMsg( std::string command, Client &sender )
 {
-	std::cout << "privmsg message: " << command << std::endl; // test only, to delete later
+	std::cout << "privmsg message: [" << command << "]" << std::endl; // test only, to delete later
 	if (command.find(" ") == std::string::npos)
 	{
 		handleReplies(ERR_NORECIPIENT, "privmsg", NULL, sender);
@@ -106,9 +109,14 @@ void	Server::ft_privMsg( std::string command, Client &sender )
 	}
 	std::string senderNick = sender.GetNickname();
 	std::string	senderUser = sender.GetUsername();
-	std::string message = ":" + senderNick + "!" + senderUser + "@HOST ";
-	message.append(params.back() + "\r\n");
+	// std::string message = ":" + senderNick + "!" + senderUser + "@HOST ";
+	std::string message = sender.getFullId() + " PRIVMSG " + command;
+	if (message[message.size() - 2] != '\r')
+		message.insert(message.size() - 1, "\r", 0, 1);
 	std::string target = params[0];
+
+	std::cout << "target = [" << target << "]" << std::endl;
+	std::cout << "formated message = [" << message << "]" << std::endl;
 
 	// check validity of target
 	// checkValidity(target);

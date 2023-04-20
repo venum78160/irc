@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   join.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 18:28:57 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 17:31:53 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/20 18:58:07 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,11 @@ void	Server::ft_join(std::string message, Client &client)
 	for (it = channels.begin(); it != ite; it++) // join each channel
 	{
 		std::string channelName = *it;
-		std::cout << "testing channel: " << channelName << std::endl; // test only, to delete later
+		if (channelName[channelName.size() - 1] == '\n')
+			channelName.erase(channelName.size() - 1, std::string::npos);
+		if (channelName[channelName.size() - 1] == '\r')
+			channelName.erase(channelName.size() - 1, std::string::npos);
+		std::cout << "testing channel: [" << channelName << "]" << std::endl; // test only, to delete later
 		if (!channelName.compare("0"))
 		{
 			joinChannel(NULL, client);
@@ -195,4 +199,13 @@ void	Server::ft_join(std::string message, Client &client)
 			createChannel(channelName, client);
 		}
 	}
+	// std::cout << "---------- PRINTING CHANNEL LIST ----------" << std::endl;
+	// std::vector<Channel *>::iterator it3;
+	// 	std::vector<Channel *>::iterator ite3 = _channels.end();
+	// 	for (it3 = _channels.begin(); it3 != ite3; it3++)
+	// 	{
+	// 		std::string name = (*it3)->getName();
+	// 		std::cout << "Channel: " << name << std::endl;
+	// 	}
+	// std::cout << "END OF LIST." << std::endl;
 }

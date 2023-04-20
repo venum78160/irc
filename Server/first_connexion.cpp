@@ -106,6 +106,7 @@ void Server::handleFirstConnection(int clientSocket)
         _MClient[clientSocket].SetUsername(username);
         _MClient[clientSocket].SetServername("");
         _MClient[clientSocket].SetMode("online");
+        _MClient[clientSocket].setFullId(nickname + "!" + username + "@HOST");
 
         std::string reply = ":127.0.0.1 001 " + nickname + " :Welcome to the Internet Relay Network " + nickname + "!" + username + "@HOST\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);

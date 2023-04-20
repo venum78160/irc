@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 17:46:41 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/20 19:06:33 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,9 +82,9 @@ void Channel::setUserLimit( int limit )
 void Channel::sendMessage( std::string message, Client const receiver )
 {
 	int 			clientSocket = receiver.GetSocketFD();
-	unsigned int	msgLen = message.size();
+	// unsigned int	msgLen = message.size();
 
-	send(clientSocket, &message, msgLen, 0);
+	send(clientSocket, message.c_str(), message.size(), 0);
 }
 
 void Channel::broadcastMessage( std::string message, Client sender )
@@ -99,6 +99,7 @@ void Channel::broadcastMessage( std::string message, Client sender )
 	{
 		if (it->first.GetUsername() != sender.GetUsername())
 			sendMessage(message, it->first);
+		it++;
 	}
 }
 

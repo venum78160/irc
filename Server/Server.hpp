@@ -55,7 +55,7 @@ public:
     Channel *getChannelByName(std::string channelName);
 
 	void	notifyChannel( std::string channelName, std::string &msg, Client &sender );
-	void	sendPrivMsg( std::string targetNick, std::string command, Client &sender );
+	void	sendPrivMsg( std::string targetNick, std::string &command, Client &sender );
 	void	ft_privMsg( std::string message, Client &client );
 
 	void	ft_kick( std::string command, Client &sender );
