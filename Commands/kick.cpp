@@ -41,8 +41,7 @@ void	Server::ft_kick( std::string command, Client &sender )
 		return ;
 	}
 
-	Channel		*channel = nullptr;
-	Client		target = nullptr;
+	Channel		*channel = NULL;
 	std::string	senderNick = sender.GetNickname();
 	std::string channelName = params[0];
 	std::string	targetNick = params[1];
@@ -61,7 +60,7 @@ void	Server::ft_kick( std::string command, Client &sender )
 			break ;
 		}
 	}
-	if (it == ite || channel == nullptr) // channel not found in list
+	if (it == ite || channel == NULL) // channel not found in list
 	{
 		// send error
 		return ;
@@ -73,7 +72,7 @@ void	Server::ft_kick( std::string command, Client &sender )
 	{
 		if ((it->second).GetNickname() == targetNick)
 		{
-			target = (it->second);
+			Client target = (it->second);
 			break ;
 		}
 	}

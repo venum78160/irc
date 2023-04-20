@@ -47,7 +47,7 @@
 
 void	Server::sendPrivMsg( std::string targetNick, std::string message, Client &sender )
 {
-	Client	*target = nullptr;
+	Client	*target = NULL;
 	std::map<int , Client>::iterator it;
 	std::map<int , Client>::iterator ite = _MClient.end();
 
@@ -59,7 +59,7 @@ void	Server::sendPrivMsg( std::string targetNick, std::string message, Client &s
 			break ;
 		}
 	}
-	if (it == ite || target == nullptr) // no such client
+	if (it == ite || target == NULL) // no such client
 	{
 		handleReplies(ERR_NOSUCHNICK, targetNick, NULL, sender);
 		return ;
@@ -69,7 +69,7 @@ void	Server::sendPrivMsg( std::string targetNick, std::string message, Client &s
 
 void	Server::notifyChannel( std::string channelName, std::string &msg, Client &sender )
 {
-	Channel	*targetChannel = nullptr;
+	Channel	*targetChannel = NULL;
 	std::vector<Channel *>::iterator it;
 	std::vector<Channel *>::iterator ite = _channels.end();
 
@@ -81,7 +81,7 @@ void	Server::notifyChannel( std::string channelName, std::string &msg, Client &s
 			break ;
 		}
 	}
-	if (it == ite || targetChannel == nullptr) // channel not found
+	if (it == ite || targetChannel == NULL) // channel not found
 	{
 		handleReplies(ERR_NOSUCHNICK, channelName, NULL, sender);
 		return ;

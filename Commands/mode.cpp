@@ -149,6 +149,8 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
 void Server::executeModeUsers(Client &client, std::vector<std::string> &params)
 {
     Client &user = getClientByNickname(params[1]);
+    if (user.GetServername() == "")
+        return ;
     Channel *channel = getChannelByName(user.GetServername());
     std::map<Client, bool> users = channel->getUsers();
     if (params[2][0] != '+' && params[2][0] != '-')
