@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 16:23:42 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/21 04:02:04 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/21 04:11:04 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ void	Server::notifyChannel( std::string channelName, std::string &msg, Client &s
 	{
 		if (!((*it)->getName()).compare(channelName))
 		{
-			// std::cout << "found target channel:" << channelName << std::endl;
 			targetChannel = *it;
 			break ;
 		}
@@ -108,7 +107,6 @@ void	Server::ft_privMsg( std::string command, Client &sender )
 	}
 	std::string senderNick = sender.GetNickname();
 	std::string	senderUser = sender.GetUsername();
-	// std::string message = ":" + senderNick + "!" + senderUser + "@HOST ";
 	std::string message = ":" + sender.getFullId() + " PRIVMSG " + command;
 	// if (message[message.size() - 2] != '\n')
 	// 	message.insert(message.size() - 1, "\n", 0, 1);
