@@ -51,8 +51,8 @@ public:
 	std::vector<std::string>	getBlacklist( void ) const;
 
 	// Messages handling
-	void	broadcastMessage( std::string message, Client sender );
-	void	sendMessage( std::string message, Client const receiver );
+	void	broadcastMessage( std::string &message, Client &sender );
+	void	sendMessage( std::string &message, Client const &receiver );
 
 	// Exceptions
 	class	channelException : public std::exception

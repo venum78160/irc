@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/20 19:06:33 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/21 03:42:40 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,15 +79,16 @@ void Channel::setUserLimit( int limit )
 // 	return (true);
 // }
 
-void Channel::sendMessage( std::string message, Client const receiver )
+void Channel::sendMessage( std::string &message, Client const &receiver )
 {
 	int 			clientSocket = receiver.GetSocketFD();
 	// unsigned int	msgLen = message.size();
 
+	std::cout << "sending message to " << receiver.GetNickname() << std::endl;
 	send(clientSocket, message.c_str(), message.size(), 0);
 }
 
-void Channel::broadcastMessage( std::string message, Client sender )
+void Channel::broadcastMessage( std::string &message, Client &sender )
 {
 	std::map<Client, bool>::iterator	it;
 	std::map<Client, bool>::iterator	ite;
@@ -97,7 +98,7 @@ void Channel::broadcastMessage( std::string message, Client sender )
 	
 	while (it != ite)
 	{
-		if (it->first.GetUsername() != sender.GetUsername())
+		if (it->first.GetNickname() != sender.GetNickname())
 			sendMessage(message, it->first);
 		it++;
 	}

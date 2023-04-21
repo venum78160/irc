@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 16:23:42 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/20 19:17:41 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/21 04:02:04 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,6 @@ void	Server::sendPrivMsg( std::string targetNick, std::string &message, Client &
 	std::map<int , Client>::iterator it;
 	std::map<int , Client>::iterator ite = _MClient.end();
 
-	std::cout << "targetNick = " << targetNick << " and message = " << message << std::endl;
-
 	for (it = _MClient.begin(); it != ite; it++)
 	{
 		if (!((it->second).GetNickname()).compare(targetNick))
@@ -66,7 +64,6 @@ void	Server::sendPrivMsg( std::string targetNick, std::string &message, Client &
 		handleReplies(ERR_NOSUCHNICK, targetNick, NULL, sender);
 		return ;
 	}
-	std::cout << "SENDING FOLLOWING MESSAGE: [" << message << "]" << std::endl;
 	send(target->GetSocketFD(), message.c_str(), message.size(), 0);
 }
 
@@ -80,12 +77,14 @@ void	Server::notifyChannel( std::string channelName, std::string &msg, Client &s
 	{
 		if (!((*it)->getName()).compare(channelName))
 		{
+			// std::cout << "found target channel:" << channelName << std::endl;
 			targetChannel = *it;
 			break ;
 		}
 	}
 	if (it == ite || targetChannel == NULL) // channel not found
 	{
+		std::cout << "no such channel" << std::endl;
 		handleReplies(ERR_NOSUCHNICK, channelName, NULL, sender);
 		return ;
 	}
@@ -110,13 +109,13 @@ void	Server::ft_privMsg( std::string command, Client &sender )
 	std::string senderNick = sender.GetNickname();
 	std::string	senderUser = sender.GetUsername();
 	// std::string message = ":" + senderNick + "!" + senderUser + "@HOST ";
-	std::string message = sender.getFullId() + " PRIVMSG " + command;
-	if (message[message.size() - 2] != '\r')
-		message.insert(message.size() - 1, "\r", 0, 1);
+	std::string message = ":" + sender.getFullId() + " PRIVMSG " + command;
+	// if (message[message.size() - 2] != '\n')
+	// 	message.insert(message.size() - 1, "\n", 0, 1);
 	std::string target = params[0];
 
-	std::cout << "target = [" << target << "]" << std::endl;
-	std::cout << "formated message = [" << message << "]" << std::endl;
+	// std::cout << "target = [" << target << "]" << std::endl;
+	// std::cout << "formated message = [" << message << "]" << std::endl;
 
 	// check validity of target
 	// checkValidity(target);
