@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/20 01:44:45 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/20 02:23:51 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/22 23:47:14 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,71 +30,65 @@ std::vector<std::string> splitThreeArgs( std::string command )
 	return (ret);
 }
 
+
 void	Server::ft_kick( std::string command, Client &sender )
 {
-	// we need a vector with 3 args max : first one is the channel, second one is the user, third and optional one is the message that can contain spaces
+	// we need a vector with 2 args min, 3 args max : first one is the channel, second one is the user, third and optional one is the message that can contain spaces
 
 	std::vector<std::string>	params = splitThreeArgs(command);
 	if (params.size() < 2) // missing arguments
 	{
-		// send error
+		handleReplies(ERR_NEEDMOREPARAMS, "KICK", NULL, sender);
 		return ;
 	}
 
 	Channel		*channel = NULL;
+	Client		*target = NULL;
 	std::string	senderNick = sender.GetNickname();
 	std::string channelName = params[0];
 	std::string	targetNick = params[1];
-	std::string	kickReason;
+	const char  *kickReason = NULL;
 	if (params.size() == 3)
-		kickReason = params[2];
+		kickReason = (params[2]).c_str();
 
 	// find channel
-	std::vector<Channel *>::iterator	it;
-	std::vector<Channel *>::iterator	ite = _channels.end();
-	for (it = _channels.begin(); it != ite; it++)
+	channel = findChanByName(channelName);
+	if (channel == NULL) // channel doesn't exist
 	{
-		if (!((*it)->getName()).compare(channelName))
-		{
-			channel = *it;
-			break ;
-		}
-	}
-	if (it == ite || channel == NULL) // channel not found in list
-	{
-		// send error
+		std::cout << "Channel doesn't exist" << std::endl; // test
+		handleReplies(ERR_NOSUCHCHANNEL, channelName, NULL, sender);
 		return ;
 	}
-	// find target
-	std::map<int, Client>::iterator	it2;
-	std::map<int, Client>::iterator	ite2 = _channels.end();
-	for (it2 = _MClient.begin(); it != ite; it++)
+	target = channel->findUserByNick(targetNick);
+	if (target == NULL)
 	{
-		if ((it->second).GetNickname() == targetNick)
-		{
-			Client target = (it->second);
-			break ;
-		}
+		std::cout << "User doesn't exist in this channel" << std::endl; // test
+		handleReplies(ERR_USERNOTINCHANNEL, targetNick + " " + channelName, NULL, sender);
+		return ;
 	}
 	// check whether sender is an admin in that channel 
-	
-	// remove target from channel
-	channel->removeUser(target);
-
+	try
+	{
+		if (channel->isUserOp(*target) == false) // it means user isn't an op
+		{
+			std::cout << "you're not an admin lmfaooo" << std::endl; // test
+			handleReplies(ERR_CHANOPRIVSNEEDED, channelName, NULL, sender);
+			return ;
+		}
+		else // user is indeed an op : can proceed
+		{
+			std::cout << "user successfully kicked" << std::endl; // test
+			channel->removeUser(*target);
+		}
+	}
+	catch (std::exception &e) // it means user isn't even in channel
+	{
+		if (!strcmp(e.what(), "ERR_NOTONCHANNEL"))
+		{
+			std::cout << "you're not even in the channel..." << std::endl; // test
+			handleReplies(ERR_NOTONCHANNEL, channelName, NULL, sender);
+			return ;
+		}
+	}
 	// handle replies
 }
-
-// int main()
-// {
-// 	std::string tester  = "Arg1 Arg2 ArgA B C";
-// 	std::vector<std::string> myvector = splitArgs(tester);
-
-// 	std::vector<std::string>::iterator it = myvector.begin();
-// 	std::vector<std::string>::iterator ite = myvector.end();
-
-// 	while (it != ite)
-// 	{
-// 		std::cout << *it << std::endl;
-// 		it++;
-// 	}
-// }

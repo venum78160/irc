@@ -24,15 +24,16 @@ public:
 	bool operator==(const Channel& other) const;
 	bool operator<(const Channel& other) const;
 
-	// bool	checkNameValidity( std::string &name ); // checks if channel name is valid. should later be included in Server class as well
+	// Utils
+	bool	isUserOp( Client &user );
 
 	// Accessors
 	std::string 	getName( void ) const;
-	// void			rename( std::string name );
 	int 			getUserLimit( void ) const;
 	void			setUserLimit( int limit );
 
-	int		getNbUsers( void ) const;
+	int				getNbUsers( void ) const;
+	Client			*findUserByNick( std::string nick );
 
 	std::map<Client, bool>	const &getUsers( void ) const;
 

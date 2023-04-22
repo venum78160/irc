@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/21 03:42:40 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/22 23:39:14 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,4 +198,34 @@ void Channel::removeToBlacklist(std::string nickname)
 bool Channel::isInBlacklist(std::string nickname)
 {
     return (std::find(this->_blacklist.begin(), this->_blacklist.end(), nickname) != this->_blacklist.end());
+}
+
+bool Channel::isUserOp( Client &user )
+{
+	std::map<Client, bool>::iterator 	it;
+	std::map<Client, bool>::iterator 	ite = _users.end();
+	std::string							targetNick = user.GetNickname();
+	for (it = _users.begin(); it != ite; it++)
+	{
+		if (!((it->first).GetNickname()).compare(targetNick))
+			return (it->second);
+	}
+	throw (channelException("ERR_NOTONCHANNEL"));
+}
+
+Client	*Channel::findUserByNick( std::string nick )
+{
+    Client  *user = NULL;
+    std::map<Client, bool>::iterator it;
+    std::map<Client, bool>::iterator ite = _users.end();
+
+    for (it = _users.begin(); it!= ite; it++)
+    {
+        if (it->first.GetNickname() == nick)
+        {
+            user = const_cast<Client *>(&(it->first));
+            break ;
+        }
+    }
+    return (user);
 }

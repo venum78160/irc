@@ -42,6 +42,8 @@ public:
     bool    channelExist(std::string channelName);
     bool    nicknameExist(std::string nickname);
 	
+	Channel	*findChanByName( std::string channelName );
+	Client	*findUserByNick( std::string nick );
 
 
 	// Commands

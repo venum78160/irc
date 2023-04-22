@@ -17,6 +17,41 @@ std::vector<Channel *> Server::getServerChannels()
     return (_channels);
 }
 
+Channel	*Server::findChanByName( std::string channelName )
+{
+    Channel *chan = NULL;
+
+    std::vector<Channel *>::iterator it;
+    std::vector<Channel *>::iterator ite = _channels.end();
+
+    for (it = _channels.begin(); it!= ite; it++)
+    {
+        if ((*it)->getName() == channelName)
+        {
+            chan = *it;
+            break ;
+        }
+    }
+    return (chan);
+}
+
+Client	*Server::findUserByNick( std::string nick )
+{
+    Client  *user = NULL;
+    std::map<int, Client>::iterator it;
+    std::map<int, Client>::iterator ite = _MClient.end();
+
+    for (it = _MClient.begin(); it!= ite; it++)
+    {
+        if (it->second.GetNickname() == nick)
+        {
+            user = &(it->second);
+            break ;
+        }
+    }
+    return (user);
+}
+
 //******************************//
 // 		  S E T T E R S		    //
 //******************************//

@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42nice.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/20 01:43:37 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/22 23:44:17 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,14 @@ void	Server::handleMessage(std::string message, Client &client)
         std::cout << "in ping" << std::endl;
         std::string reply = "PONG " + message.substr(5);
         send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+    }
+    if (message.find("KICK") != std::string::npos && message.find("KICK") == 0)
+    {
+        std::cout << "in kick" << std::endl;
+        // if (message.size() < 6) // pour éviter le segfault
+            // ERR_NEEDMOREPARAMS + return
+        std::string kickmsg = message.substr(message.find("KICK") + 5, message.size());
+		this->ft_kick(kickmsg, client);
     }
 }
 
