@@ -11,9 +11,11 @@ Client::Client()
 
 Client::Client(int sock_fd, const std::string& nickname, const std::string& username, const std::string& servername, const std::string& mode)
     : sock_fd_(sock_fd), nickname_(nickname), username_(username), servername_(servername), mode_(mode) 
-	{
-		buffer_.resize(BUFFER_SIZE);
-	}
+{
+    std::string fullId = nickname + "!" + username + "@HOST";
+    setFullId(fullId);
+	buffer_.resize(BUFFER_SIZE);
+}
 
 Client::~Client() {}
 //******************************//

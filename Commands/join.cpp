@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 18:28:57 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 17:31:53 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/23 21:25:28 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,11 +83,12 @@ void	Server::createChannel(std::string channelName, Client &client)
 	_channels.push_back(newChannel);
 	std::cout << "Channel successfully created: " << channelName << std::endl; // test only, to delete later
 	joinChannel(newChannel, client);
+	newChannel->giveOpRights(client);
 }
 
 bool	Server::joinErrors(Channel *channel, Client &client)
 {
-	if (channel == nullptr)
+	if (channel == NULL)
 	{
 		// JOIN 0 means leave all channels
 		for (size_t i = 0; i < client.GetChannels().size(); i++)
@@ -113,14 +114,14 @@ bool	Server::joinErrors(Channel *channel, Client &client)
 	{
 		if (!(*it).compare(clientNick))
 		{
-			handleReplies(ERR_BANNEDFROMCHAN, channel->getName(), nullptr, client);
+			handleReplies(ERR_BANNEDFROMCHAN, channel->getName(), NULL, client);
 			return (true);
 		}
 	}
 	// check if channel is full
 	if (channel->getUserLimit() > -1 && channel->getNbUsers() >= channel->getUserLimit())
 	{
-		handleReplies(ERR_CHANNELISFULL, channel->getName(), nullptr, client);
+		handleReplies(ERR_CHANNELISFULL, channel->getName(), NULL, client);
 		return (true);
 	}
 	return (false);
@@ -161,7 +162,7 @@ void	Server::ft_join(std::string message, Client &client)
 	if (params.size() < 2) // check if there is enough params
 	{
 		std::cout << "not enough params" << std::endl; // test only, to delete later
-		handleReplies(ERR_NEEDMOREPARAMS, "join", nullptr, client);
+		handleReplies(ERR_NEEDMOREPARAMS, "join", NULL, client);
 		return ;
 	}
 
@@ -172,10 +173,14 @@ void	Server::ft_join(std::string message, Client &client)
 	for (it = channels.begin(); it != ite; it++) // join each channel
 	{
 		std::string channelName = *it;
-		std::cout << "testing channel: " << channelName << std::endl; // test only, to delete later
+		if (channelName[channelName.size() - 1] == '\n')
+			channelName.erase(channelName.size() - 1, std::string::npos);
+		if (channelName[channelName.size() - 1] == '\r')
+			channelName.erase(channelName.size() - 1, std::string::npos);
+		std::cout << "testing channel: [" << channelName << "]" << std::endl; // test only, to delete later
 		if (!channelName.compare("0"))
 		{
-			joinChannel(nullptr, client);
+			joinChannel(NULL, client);
 			return ;
 		}
 		// check if channel exists
@@ -195,4 +200,13 @@ void	Server::ft_join(std::string message, Client &client)
 			createChannel(channelName, client);
 		}
 	}
+	// std::cout << "---------- PRINTING CHANNEL LIST ----------" << std::endl;
+	// std::vector<Channel *>::iterator it3;
+	// 	std::vector<Channel *>::iterator ite3 = _channels.end();
+	// 	for (it3 = _channels.begin(); it3 != ite3; it3++)
+	// 	{
+	// 		std::string name = (*it3)->getName();
+	// 		std::cout << "Channel: " << name << std::endl;
+	// 	}
+	// std::cout << "END OF LIST." << std::endl;
 }

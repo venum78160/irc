@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/18 17:46:41 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/23 20:34:06 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,31 +28,24 @@ std::string Channel::getName( void ) const
 
 Channel::Channel(const Channel &other)
 {
-    this->_name = other._name;
-    this->_users = other._users;
-    this->_maxUsers = other._maxUsers;
-    this->_topic = other._topic;
+	this->_name = other._name;
+	this->_users = other._users;
+	this->_maxUsers = other._maxUsers;
+	this->_topic = other._topic;
 }
 
 Channel &Channel::operator=(const Channel &other)
 {
-    this->_name = other._name;
-    this->_users = other._users;
-    this->_maxUsers = other._maxUsers;
-    this->_topic = other._topic;
-    return (*this);
+	this->_name = other._name;
+	this->_users = other._users;
+	this->_maxUsers = other._maxUsers;
+	this->_topic = other._topic;
+	return (*this);
 }
 
 
-// void Channel::rename( std::string name )
-// {
-// 	this->_name = name;
-// }
-
 int Channel::getUserLimit( void ) const
 {
-	// if (this->_maxUsers == -1)
-	// 	throw (channelException("No user limit set"));
 	return (this->_maxUsers);
 }
 
@@ -63,31 +56,16 @@ void Channel::setUserLimit( int limit )
 	this->_maxUsers = limit;
 }
 
-// bool	Channel::checkNameValidity( std::string &name )
-// {
-// 	int	nameLen = name.size();
-// 	if (nameLen > 50 || nameLen < 2)
-// 		return (false);
-// 	if (name[0] != '#')
-// 		return (false);
-
-// 	for (int i = 0; i < nameLen; i++)
-// 	{
-// 		if (isspace(name[i]) || name[i] == ',' || name[i] == 7)
-// 			return (false);
-// 	}
-// 	return (true);
-// }
-
-void Channel::sendMessage( std::string message, Client const receiver )
+void Channel::sendMessage( std::string &message, Client const &receiver )
 {
 	int 			clientSocket = receiver.GetSocketFD();
-	unsigned int	msgLen = message.size();
+	// unsigned int	msgLen = message.size();
 
-	send(clientSocket, &message, msgLen, 0);
+	std::cout << "sending message to " << receiver.GetNickname() << std::endl;
+	send(clientSocket, message.c_str(), message.size(), 0);
 }
 
-void Channel::broadcastMessage( std::string message, Client sender )
+void	Channel::broadcastMessageToAll( std::string &message )
 {
 	std::map<Client, bool>::iterator	it;
 	std::map<Client, bool>::iterator	ite;
@@ -97,8 +75,24 @@ void Channel::broadcastMessage( std::string message, Client sender )
 	
 	while (it != ite)
 	{
-		if (it->first.GetUsername() != sender.GetUsername())
+		sendMessage(message, it->first);
+		it++;
+	}
+}
+
+void Channel::broadcastMessage( std::string &message, Client &sender )
+{
+	std::map<Client, bool>::iterator	it;
+	std::map<Client, bool>::iterator	ite;
+
+	it = (this->_users).begin();
+	ite = (this->_users).end();
+	
+	while (it != ite)
+	{
+		if (it->first.GetNickname() != sender.GetNickname())
 			sendMessage(message, it->first);
+		it++;
 	}
 }
 
@@ -107,7 +101,12 @@ void Channel::addUser( Client user )
 	if (static_cast<int>(this->_users.size()) == this->_maxUsers)
 		throw (channelException("Channel is at full capacity."));
 	
-	std::pair<Client, bool> newUser(user, false);
+	for (size_t i = 0; i < this->_blacklist.size(); i++)
+    {
+        if (this->_blacklist[i] == user.GetUsername())
+            throw (channelException("You are banned from this channel."));
+    }
+    std::pair<Client, bool> newUser(user, false);
 	(this->_users).insert(newUser);
 }
 
@@ -171,4 +170,54 @@ std::vector<std::string> Channel::getBlacklist( void ) const
 bool Channel::operator<(const Channel& rhs) const
 {
 	return (this->_name < rhs._name);
+}
+
+void Channel::addToBlacklist(std::string nickname)
+{
+	for (size_t i = 0; i < this->_blacklist.size(); i++) // check if already in blacklist
+	{
+		if (this->_blacklist[i] == nickname)
+			return ;
+	}
+	this->_blacklist.push_back(nickname);
+}
+
+void Channel::removeToBlacklist(std::string nickname)
+{
+	this->_blacklist.erase(std::remove(this->_blacklist.begin(), this->_blacklist.end(), nickname), this->_blacklist.end());
+}
+
+bool Channel::isInBlacklist(std::string nickname)
+{
+	return (std::find(this->_blacklist.begin(), this->_blacklist.end(), nickname) != this->_blacklist.end());
+}
+
+bool Channel::isUserOp( Client &user )
+{
+	std::map<Client, bool>::iterator 	it;
+	std::map<Client, bool>::iterator 	ite = _users.end();
+	std::string							targetNick = user.GetNickname();
+	for (it = _users.begin(); it != ite; it++)
+	{
+		if (!((it->first).GetNickname()).compare(targetNick))
+			return (it->second);
+	}
+	throw (channelException("ERR_NOTONCHANNEL"));
+}
+
+Client	*Channel::findUserByNick( std::string nick )
+{
+    Client  *user = NULL;
+    std::map<Client, bool>::iterator it;
+    std::map<Client, bool>::iterator ite = _users.end();
+
+    for (it = _users.begin(); it!= ite; it++)
+    {
+        if (it->first.GetNickname() == nick)
+        {
+            user = const_cast<Client *>(&(it->first));
+            break ;
+        }
+    }
+    return (user);
 }

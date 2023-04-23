@@ -17,6 +17,41 @@ std::vector<Channel *> Server::getServerChannels()
     return (_channels);
 }
 
+Channel	*Server::findChanByName( std::string channelName )
+{
+    Channel *chan = NULL;
+
+    std::vector<Channel *>::iterator it;
+    std::vector<Channel *>::iterator ite = _channels.end();
+
+    for (it = _channels.begin(); it!= ite; it++)
+    {
+        if ((*it)->getName() == channelName)
+        {
+            chan = *it;
+            break ;
+        }
+    }
+    return (chan);
+}
+
+Client	*Server::findUserByNick( std::string nick )
+{
+    Client  *user = NULL;
+    std::map<int, Client>::iterator it;
+    std::map<int, Client>::iterator ite = _MClient.end();
+
+    for (it = _MClient.begin(); it!= ite; it++)
+    {
+        if (it->second.GetNickname() == nick)
+        {
+            user = &(it->second);
+            break ;
+        }
+    }
+    return (user);
+}
+
 //******************************//
 // 		  S E T T E R S		    //
 //******************************//
@@ -42,9 +77,7 @@ void Server::removeClient(int fd)
             close(fd); // fermer le descripteur de fichier
             _pollFds.erase(it); // supprimer le pollfd de la liste
 			if (isClientAdded(fd) == true)
-			{
             	_MClient.erase(fd); // supprimer le client de la map
-			}
             break;
         }
         ++it;
@@ -53,13 +86,15 @@ void Server::removeClient(int fd)
 
 void	Server::eventClient(Client *Client)
 {
-	std::string message = recvAllData(Client->GetSocketFD());
-	std::cout << "[event Client] Message reçu : |" << message << "|" <<std::endl;
-	// Remplir le vecteur buffer_ de la classe Client avec le contenu de message
-	Client->SetBuffer(message);
-	// Client->printClientInfo();
-	this->handleMessage(message, *Client);
-	return ;
+    std::string message = recvAllData(Client->GetSocketFD());
+    if (message == "DISCONNECTED")
+        return ;
+    std::cout << "[event Client] Message reçu : |" << message << "|" <<std::endl;
+    // Remplir le vecteur buffer_ de la classe Client avec le contenu de message
+    Client->SetBuffer(message);
+    // Client->printClientInfo();
+    this->handleMessage(message, *Client);
+    return ;
 }
 
 bool Server::isClientAdded(int fd) const

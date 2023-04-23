@@ -24,20 +24,24 @@ public:
 	bool operator==(const Channel& other) const;
 	bool operator<(const Channel& other) const;
 
-	// bool	checkNameValidity( std::string &name ); // checks if channel name is valid. should later be included in Server class as well
+	// Utils
+	bool	isUserOp( Client &user );
 
 	// Accessors
 	std::string 	getName( void ) const;
-	// void			rename( std::string name );
 	int 			getUserLimit( void ) const;
 	void			setUserLimit( int limit );
 
-	int		getNbUsers( void ) const;
+	int				getNbUsers( void ) const;
+	Client			*findUserByNick( std::string nick );
 
 	std::map<Client, bool>	const &getUsers( void ) const;
 
 	void	removeUser( Client user );
 	void	addUser( Client user );
+	void	addToBlacklist(std::string nickname);
+	void	removeToBlacklist(std::string nickname);
+	bool	isInBlacklist(std::string nickname);
 
 	void	giveOpRights( Client user );
 	void	removeOpRights( Client user );
@@ -48,8 +52,9 @@ public:
 	std::vector<std::string>	getBlacklist( void ) const;
 
 	// Messages handling
-	void	broadcastMessage( std::string message, Client sender );
-	void	sendMessage( std::string message, Client const receiver );
+	void	broadcastMessageToAll( std::string &message );
+	void	broadcastMessage( std::string &message, Client &sender );
+	void	sendMessage( std::string &message, Client const &receiver );
 
 	// Exceptions
 	class	channelException : public std::exception
