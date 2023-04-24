@@ -2,7 +2,7 @@ NAME = ircserv
 CC = c++
 FLAGS = -Wall -Werror -Wextra -std=c++98 -fsanitize=address -g
 SRCS = client.cpp Channel.cpp main.cpp parser.cpp replies.cpp \
-		$(addprefix Commands/, commands.cpp join.cpp kick.cpp mode.cpp privmsg.cpp topic.cpp ) \
+		$(addprefix Commands/, commands.cpp join.cpp kick.cpp mode.cpp nick_and_user.cpp privmsg.cpp topic.cpp ) \
 		$(addprefix Server/, run_and_start.cpp Server.cpp first_connexion.cpp) \
 
 all: $(NAME)
