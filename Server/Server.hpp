@@ -65,6 +65,9 @@ public:
 	void	ft_topic( std::string &msg, Client &sender );
 
 	void	partCommand( std::string channelName, Client &client, std::string message);
+	bool	checkNickValidity( std::string &nick );
+	void	ft_nick( std::string &message, Client &client );
+	void	ft_user( std::string &message, Client &sender );
 	void	quitCommand(Client &client, std::string message);
 	void	modeCommand(Client &client, std::string message);
 };

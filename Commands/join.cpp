@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 18:28:57 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/23 21:25:28 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/24 18:03:41 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,17 +138,10 @@ void	Server::joinChannel(Channel *channel, Client &client)
 		return ;
 
 	channel->addUser(client);
-
-	/* reply sucessfully joined :
-	- send client list of commands available
-	- send client topic of channel with RPL_TOPIC
-	- send client list of users in channel with RPL_NAMREPLY */
 	client.SetServername(channel->getName());
 	client.AddChannel(channel->getName());
-	std::cout << "Channel successfully joined: " << channel->getName() << std::endl; // test only, to delete later
+	// std::cout << "Channel successfully joined: " << channel->getName() << std::endl; // test only, to delete later
 
-	// std::string reply = ":127.0.0.1 " + client.GetNickname() + " JOIN " + channelName + + "\r\n";
-	// send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 	handleReplies(RPL_NAMREPLY, "", channel, client);
 	handleReplies(RPL_TOPIC, "", channel, client);
 }

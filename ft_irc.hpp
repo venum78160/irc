@@ -19,10 +19,10 @@
 #include <sstream>
 #include <cstring>
 #include <algorithm>
-
 #include "client.hpp"
 #include "Channel.hpp"
 #include "Server/Server.hpp"
+#include "bot_weather/RainyBunny.hpp"
 
 #define MAX_CLIENTS 10
 #define BUFFER_SIZE 1024 // Taille du buffer de réception
@@ -44,6 +44,9 @@
 #define ERR_TOOMANYCHANNELS 405
 #define ERR_NORECIPIENT 411
 #define ERR_NOTEXTTOSEND 412
+#define ERR_NONICKNAMEGIVEN 431
+#define ERR_ERRONEUSNICKNAME 432
+#define ERR_NICKNAMEINUSE 433
 #define ERR_USERNOTINCHANNEL 441
 #define ERR_NOTONCHANNEL 442
 #define ERR_NEEDMOREPARAMS 461
@@ -60,9 +63,9 @@
 #define reset           "[0m"
 
 // PROTOTYPES
-std::vector<std::string> split(const std::string& s, char delimiter);
-bool parseClientInfo(std::string& message, std::string& password, std::string& nickname, std::string& username);
-void removeNewlinesAndDoubleSpaces(std::string& str);
+std::vector<std::string>	split(const std::string& s, char delimiter);
+bool						parseClientInfo(std::string& message, std::string& password, std::string& nickname, std::string& username);
+void						removeNewlinesAndDoubleSpaces(std::string& str);
 
 std::vector<std::string> 	splitStr( std::string str, char sep );
 std::string					ft_itoa( int number );

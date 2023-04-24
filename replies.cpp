@@ -6,13 +6,19 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/16 15:48:48 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/24 15:40:54 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/24 18:20:43 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 // A implémenter à l'intérieur de la classe Server plus tard
 
 #include "ft_irc.hpp"
+
+// void	commandsReturns( std::string &param, std::string &reply )
+// {
+// 	if (!param.compare("NICK"))
+		
+// }
 
 void	successReplies( int code, Channel &param, std::string &reply )
 {
@@ -77,6 +83,12 @@ void	parsingErrors( int code, std::string &param, std::string &reply )
 		reply.append(param + ":No such nick/channel\r\n");
 	else if (code == ERR_NOTEXTTOSEND)
 		reply.append(":No text to send\r\n");
+	else if (code == ERR_NONICKNAMEGIVEN)
+		reply.append(":No nickname given\r\n");
+	else if (code == ERR_ERRONEUSNICKNAME)
+		reply.append(param + ":Erroneous nickname\r\n");
+	else if (code == ERR_NICKNAMEINUSE)
+		reply.append(param + ":Nickname is already in use\r\n");
 }
 
 void	sendReply( Client &client, std::string reply )
