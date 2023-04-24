@@ -182,9 +182,6 @@ void print_very_cloudy()
 }
 
 
-
-
-
 std::string urlencode(const std::string& str) {
     std::ostringstream escaped;
     escaped.fill('0');
@@ -318,10 +315,19 @@ void    display_weather(std::string id)
     {
         print_cloudy();
     }
+void	start_bot()
+{
+	std::cout << "Bonjour ! Je suis RainyBunny, votre petit compagnon météo 🐰. Je suis ici pour vous aider à rester au sec et à l'abri du mauvais temps. Demandez-moi simplement la météo à n'importe quel endroit et je vous donnerai les dernières prévisions avec plaisir !" << std::endl;
+	const char* city = "Caen";
+    const char* key = "b693c063ba0578ae1fc1907e4426a73f";
+	std::string response = get_weather(city, key);
+	std::map<std::string, std::string> result = parse_json(response);
+
+
 }
 
 int main() {
-    const char* city = "Caen";
+    const char* city = "Gonneville-sur-mer";
     const char* key = "b693c063ba0578ae1fc1907e4426a73f";
 
     std::string response = get_weather(city, key);
@@ -345,3 +351,9 @@ int main() {
 // sunny
 // cloudy
 // gcc -o bot bot.cpp -lcurl -lstdc++
+
+
+// Bien sûr ! J'ai regardé par la fenêtre et je peux te dire que le temps est... ah non, attendez, c'est juste le reflet de mon écran. Laissez-moi vérifier la vraie météo pour Paris.
+// RainyBunny 🐰
+
+// Bonjour ! Je suis RainyBunny, votre petit compagnon météo. Je suis ici pour vous aider à rester au sec et à l'abri du mauvais temps. Demandez-moi simplement la météo à n'importe quel endroit et je vous donnerai les dernières prévisions avec plaisir !"
