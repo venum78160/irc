@@ -41,7 +41,7 @@ public:
 	bool	is_good_infos(std::string message, int clientSocket);
 	bool	channelExist(std::string channelName);
 	bool	nicknameExist(std::string nickname);
-	
+
 	Channel	*findChanByName( std::string channelName );
 	Client	*findUserByNick( std::string nick );
 
@@ -64,7 +64,7 @@ public:
 
 	void	ft_topic( std::string &msg, Client &sender );
 
-	void	partCommand( std::string channelName, Client &client );
+	void	partCommand( std::string channelName, Client &client, std::string message);
 	void	quitCommand(Client &client, std::string message);
 	void	modeCommand(Client &client, std::string message);
 };

@@ -62,16 +62,6 @@ void	Server::run()
 					continue;
 				}
 				eventClient(&_MClient[fd_client]);
-                if (_pollFds[i].revents & (POLLERR | POLLHUP))
-                {
-                    std::cerr << "Client disconnected 2" << std::endl;
-                    removeClient(_pollFds[i].fd);
-                }
-			}
-			else if (_pollFds[i].revents & (POLLHUP | POLLERR))
-			{
-				std::cout << "Déconnexion du client" << std::endl;
-				removeClient(_pollFds[i].fd);
 			}
 		}
 	}

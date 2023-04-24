@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/23 21:42:01 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/24 18:51:51 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,9 +86,22 @@ void	Server::handleMessage(std::string message, Client &client)
 		std::cout << "in topic" << std::endl;
 		this->ft_topic(message, client);
 	}
+	if (message.find("PART") != std::string::npos && message.find("PART") == 0)
+	{
+		std::vector<std::string>	params = split(message, ' ');
+		std::string channelName = params[1];
+		std::string message = "No reason specified";
+		// check if PART #channel message\r\n or PART #channel\r\n
+		if (params.size() > 2)
+			message = params[2];
+		std::cout << "in part" << std::endl;
+		std::cout << "channelName : " << channelName << std::endl;
+		std::cout << "message : " << message << std::endl;
+		this->partCommand(channelName ,client, message);
+	}
 }
 
-void Server::partCommand(std::string channelName, Client &client)
+void Server::partCommand(std::string channelName, Client &client, std::string message)
 {
 	// Commande : PART #channel ou /part #channel
 	// 1 - Mettre en minuscule le nom du channel car il est insensible à la casse
@@ -97,7 +110,8 @@ void Server::partCommand(std::string channelName, Client &client)
 
 	// 1
 	std::transform(channelName.begin(), channelName.end(), channelName.begin(), ::tolower);
-
+	if (channelName.find("\r\n") != std::string::npos)
+		channelName = channelName.substr(0, channelName.find("\r\n"));
 	// 2
 	Channel *channelToLeave;
 
@@ -111,16 +125,32 @@ void Server::partCommand(std::string channelName, Client &client)
 			channelToLeave->removeUser(client);
 			for (size_t i = 0; i < client.GetChannels().size(); i++)
 			{
+				std::cout << "Client channel : " << client.GetChannels()[i] << std::endl;
 				if (client.GetChannels()[i] == channelName)
 				{
+					std::cout << "Removing channel from client";
 					client.RemoveChannel(channelName);
-					std::string reply = ": " + client.GetNickname() + " PART " + channelName + "\r\n";
+					std::string reply = ":" + client.GetNickname() + " PART " + channelName + " :" + message + "\r\n";
+					std::cout << "Reply : " << reply << std::endl;
+					std::map<Client, bool>connectedClients = channelToLeave->getUsers();
+					for (std::map<Client, bool>::iterator it = connectedClients.begin(); it != connectedClients.end(); ++it)
+					{
+						send(it->first.GetSocketFD(), reply.c_str(), reply.size(), 0);
+					}
 					send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 					return ;
 				}
 			}
+			// if channel empty remove it
+			if (channelToLeave->getUsers().size() == 0)
+			{
+				std::cout << "Removing channel from server" << std::endl;
+				_channels.erase(it);
+				delete channelToLeave;
+			}
 		}
 	}
+	handleReplies(ERR_NOSUCHCHANNEL, channelName, NULL, client);
 	// not found so send error
 }
 
