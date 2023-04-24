@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: vl-hotel <vl-hotel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/23 21:42:01 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/24 16:50:18 by vl-hotel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,6 +86,13 @@ void	Server::handleMessage(std::string message, Client &client)
 		std::cout << "in topic" << std::endl;
 		this->ft_topic(message, client);
 	}
+	else if (message.find("!bot") != std::string::npos && message.find("!bot") == 0)
+	{
+		std::string query = message.substr(5);
+		std::cout << "Requête Bot : " << query << std::endl;
+		start_bot(query);
+	}
+	
 }
 
 void Server::partCommand(std::string channelName, Client &client)
