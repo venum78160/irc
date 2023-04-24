@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/16 15:48:48 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/23 21:46:30 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/24 15:40:54 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,14 +88,20 @@ void	sendReply( Client &client, std::string reply )
 void	Server::handleReplies( int code, std::string param, Channel *chan, Client &target )
 {
 	std::string reply = ":127.0.0.1 " + ft_itoa(code) + " " + target.GetNickname() + " ";
+	// RETOURS DE COMMANDES
+	if (code == RPL_TOPIC || code == RPL_NOTOPIC || code == RPL_NAMREPLY)
+	{ 
+		successReplies(code, *chan, reply);
+		if (code == RPL_TOPIC || code == RPL_NOTOPIC)
+			return ;
+	}
+	// ERREURS
 	if (code == 403 || code == 405 || code == 471 || code == 473 ||
 	code == 474 || code == 475 || code == ERR_NOTONCHANNEL || code == ERR_USERNOTINCHANNEL ||
 	code == ERR_CHANOPRIVSNEEDED)
 		channelErrors(code, param, reply);
 	else if (code == 461 || code == ERR_NOSUCHNICK || code == ERR_NOTEXTTOSEND || code == ERR_NORECIPIENT)
 		parsingErrors(code, param, reply);
-	else if (code == RPL_TOPIC || code == RPL_NAMREPLY)
-		successReplies(code, *chan, reply);
 	if (code != RPL_TOPIC && code != RPL_NOTOPIC)
 		sendReply(target, reply);
 }
