@@ -22,6 +22,7 @@
 #include "client.hpp"
 #include "Channel.hpp"
 #include "Server/Server.hpp"
+#include "bot_weather/RainyBunny.hpp"
 
 #define MAX_CLIENTS 10
 #define BUFFER_SIZE 1024 // Taille du buffer de réception

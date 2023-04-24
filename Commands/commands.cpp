@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/24 18:22:26 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/24 19:28:59 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,12 @@ void	Server::handleMessage(std::string message, Client &client)
 	{
 		std::cout << "in nick" << std::endl;
 		this->ft_nick(message, client);
+	}
+	else if (message.find("!bot") != std::string::npos && message.find("!bot") == 0)
+	{
+		std::string query = message.substr(5);
+		std::cout << "Requête Bot : " << query << std::endl;
+		start_bot(query);
 	}
 }
 
