@@ -4,38 +4,11 @@
 #include <sstream>
 #include <vector>
 #include <map>
-
-
-
-#include <iostream>
-#include <sstream>
-#include <map>
-#include <string>
-#include <vector>
 #include <cstdlib>
 #include <cstring>
 #include <cctype>
-
-using std::cout;
-using std::endl;
-using std::map;
-using std::string;
-using std::stringstream;
-using std::vector;
-
-
-
-#include <iostream>
-#include <string>
-#include <map>
-
-#include <iostream>
-#include <string>
-#include <map>
-
-#include <string>
-#include <sstream>
 #include <iomanip>
+
 
 void	print_sunny()
 {
@@ -233,7 +206,6 @@ std::string urlencode(const std::string& str) {
     return escaped.str();
 }
 
-
 std::map<std::string, std::string> parse_json(std::string json_str) {
     std::map<std::string, std::string> result;
 
@@ -313,6 +285,41 @@ std::string get_weather(const char* city, const char* key) {
     return "";
 }
 
+void    display_weather(std::string id)
+{
+    std::istringstream iss(id);
+    int idit;
+     iss >> idit;
+    if (idit >= 200 && idit <= 232)
+    {
+        print_ThunderyHeavyRai();
+    }
+    else if (idit >= 300 && idit <= 321)
+    {
+        print_fog();
+    }
+    else if (idit >= 500 && idit <= 531)
+    {
+        print_heavy_rain();
+    }
+    else if (idit >= 600 && idit <= 622)
+    {
+        print_heavy_snow();
+    }
+    else if (idit >= 700 && idit <= 781)
+    {
+        print_heavy_snow_showers();
+    }
+    else if (idit == 800)
+    {
+        print_sunny();
+    }
+    else if (idit >= 801 && idit <= 804)
+    {
+        print_cloudy();
+    }
+}
+
 int main() {
     const char* city = "Caen";
     const char* key = "b693c063ba0578ae1fc1907e4426a73f";
@@ -321,76 +328,12 @@ int main() {
     std::cout << response << std::endl;
 	// parse_weather_info(response);
 	std::map<std::string, std::string> result = parse_json(response);
+    display_weather(result["id"]);
 	std::cout << "Name: " << result["name"] << std::endl;
-	std::cout << "Id: " << result["id"] << std::endl;
+	// std::cout << "Id: " << result["id"] << std::endl;
 	std::cout << "Description: " << result["description"] << std::endl;
 	std::cout << "Temperature: " << result["temp"] << "°C"<< std::endl;
 	std::cout << "Feels_like: " << result["feels_like"] << "°C"<< std::endl;
-
-
-    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@******/#@@@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@@@@@@@@@      ,@@@**********//@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@@@              ,@&*******//#@@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@,                 @@********(@@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@&                   @@   @@@******//@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@                    #@      @@*****//@@@" << std::endl;
-    std::cout << "@@@@@@@@  @@                            @@***//@@@" << std::endl;
-    std::cout << "@@@@@@@               @@@@(@@@@     /@@,    @@@@@@" << std::endl;
-    std::cout << "@@@@@,    (@@       @@                         ,@@" << std::endl;
-    std::cout << "@@@          @@                                  @" << std::endl;
-    std::cout << "@@                                               @" << std::endl;
-    std::cout << "@@        *@,,,,,,,//@@        @,,,,,,,/*@@     @@" << std::endl;
-    std::cout << "@@@@      @/,,,,,,//@@        @&,,,,,,//@@    @@@@" << std::endl;
-    std::cout << "@@@@@@@@@@@,,,,,,//@@@@@@@@@@@@,,,,,,//@@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@,,,,,,,,,,/@@@@@@@@@,,,,,,,,,,/@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@@@,,,,,,*@@@@@@@@@@@@@,,,,,,*%@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@@@@@,,/@@@@@@@@@@@@@@@@@,,/@@@@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@@@@,/@@@@@@@@@@@@@@@@@@,/@@@@@@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
-
-std::cout << "unknown :" << std::endl;
-print_unknown();
-std::cout << "cloudy :" << std::endl;
-print_cloudy();
-std::cout << "fog :" << std::endl;
-print_fog();
-std::cout << "heavy rain :" << std::endl;
-print_heavy_rain();
-std::cout << "heavy showers :" << std::endl;
-print_heavy_showers();
-std::cout << "heavy snow :" << std::endl;
-print_heavy_snow();
-std::cout << "heavy snow showers :" << std::endl;
-print_heavy_snow_showers();
-std::cout << "light rain :" << std::endl;
-print_light_rain();
-std::cout << "light showers :" << std::endl;
-print_light_showers();
-std::cout << "light sleet :" << std::endl;
-print_light_sleet();
-std::cout << "light sleet showers :" << std::endl;
-print_light_sleet_showers();
-std::cout << "light snow :" << std::endl;
-print_light_snow();
-std::cout << "light snow showers :" << std::endl;
-print_light_snow_showers();
-std::cout << "partly cloudy :" << std::endl;
-print_partly_cloudy();
-std::cout << "sunny :" << std::endl;
-print_sunny();
-std::cout << "thundery heavy rain :" << std::endl;
-print_ThunderyHeavyRai();
-std::cout << "thundery showers :" << std::endl;
-print_thundery_showers();
-std::cout << "thundery snow showers :" << std::endl;
-print_ThunderySnowShowers();
-std::cout << "very cloudy :" << std::endl;
-print_very_cloudy();
-
-
-
-
     return 0;
 }
 
@@ -401,3 +344,4 @@ print_very_cloudy();
 // heavy snow showers :
 // sunny
 // cloudy
+// gcc -o bot bot.cpp -lcurl -lstdc++
