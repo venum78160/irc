@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 17:59:13 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 18:07:25 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,12 +104,12 @@ void	Server::handleMessage(std::string message, Client &client)
 		std::cout << "in nick" << std::endl;
 		this->ft_nick(message, client);
 	}
-	if (message.find("!bot") != std::string::npos && message.find("PRIVMSG") == 0)
-	{
-		std::string query = message.substr(5);
-		std::cout << "Requête Bot : " << query << std::endl;
-		start_bot(query, client);
-	}
+	// if (message.find("!bot") != std::string::npos && message.find("PRIVMSG") == 0)
+	// {
+	// 	std::string query = message.substr(5);
+	// 	std::cout << "Requête Bot : " << query << std::endl;
+	// 	start_bot(query, client);
+	// }
 }
 
 void Server::partCommand(std::string channelName, Client &client, std::string message)
