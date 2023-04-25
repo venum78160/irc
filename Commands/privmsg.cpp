@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 16:23:42 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/23 20:48:45 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 16:55:04 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	Server::notifyChannel( std::string channelName, std::string &msg, Client &s
 		handleReplies(ERR_NOSUCHNICK, channelName, NULL, sender);
 		return ;
 	}
-	
+	std::cout << "sending msg to channel" << std::endl;
 	targetChannel->broadcastMessage(msg, sender);
 }
 

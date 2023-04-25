@@ -31,6 +31,7 @@
 #define RPL_NOTOPIC 331
 #define RPL_TOPIC 332
 #define RPL_NAMREPLY 353
+#define RPL_ENDOFNAMES 366
 
 // ERROR CODES
 #define NAMETOOLONG 0
@@ -70,3 +71,4 @@ void						removeNewlinesAndDoubleSpaces(std::string& str);
 std::vector<std::string> 	splitStr( std::string str, char sep );
 std::string					ft_itoa( int number );
 std::vector<std::string> 	splitOnFirstSpace( std::string str );
+void	sendReply( Client &client, std::string reply);

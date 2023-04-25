@@ -6,7 +6,7 @@
 /*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 16:54:56 by anggonza         ###   ########.fr       */
+/*   Updated: 2023/04/25 18:02:04 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,24 +53,24 @@ void	Server::handleMessage(std::string message, Client &client)
 		// std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
 		this->ft_join(message, client);
 	}
-	if (message.find("PRIVMSG") != std::string::npos && message.find("PRIVMSG") == 0)
+	else if (message.find("PRIVMSG") != std::string::npos && message.find("PRIVMSG") == 0)
 	{
 		std::cout << "in privmsg" << std::endl;
 		std::string privmsg = message.substr(message.find("PRIVMSG") + 8, message.size()); // attention au segfault
 		this->ft_privMsg(privmsg, client);
 	}
-	if (message.find("MODE") != std::string::npos && message.find("MODE") == 0)
+	else if (message.find("MODE") != std::string::npos && message.find("MODE") == 0)
 	{
 		std::cout << "in mode" << std::endl;
 		this->modeCommand(client, message);
 	}
-	if (message.find("PING") != std::string::npos && message.find("PING") == 0)
+	else if (message.find("PING") != std::string::npos && message.find("PING") == 0)
 	{
 		std::cout << "in ping" << std::endl;
 		std::string reply = "PONG " + message.substr(5);
 		send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 	}
-	if (message.find("KICK") != std::string::npos && message.find("KICK") == 0)
+	else if (message.find("KICK") != std::string::npos && message.find("KICK") == 0)
 	{
 		std::cout << "in kick" << std::endl;
 		if (message.size() < 6) // pour éviter le segfault
@@ -81,12 +81,12 @@ void	Server::handleMessage(std::string message, Client &client)
 		std::string kickmsg = message.substr(message.find("KICK") + 5, message.size());
 		this->ft_kick(kickmsg, client);
 	}
-	if (message.find("TOPIC") != std::string::npos && message.find("TOPIC") == 0)
+	else if (message.find("TOPIC") != std::string::npos && message.find("TOPIC") == 0)
 	{
 		std::cout << "in topic" << std::endl;
 		this->ft_topic(message, client);
 	}
-	if (message.find("PART") != std::string::npos && message.find("PART") == 0)
+	else if (message.find("PART") != std::string::npos && message.find("PART") == 0)
 	{
 		std::vector<std::string>	params = split(message, ' ');
 		std::string channelName = params[1];
@@ -99,16 +99,16 @@ void	Server::handleMessage(std::string message, Client &client)
 		std::cout << "message : " << message << std::endl;
 		this->partCommand(channelName ,client, message);
 	}
-	if (message.find("NICK") != std::string::npos && message.find("NICK") == 0)
+	else if (message.find("NICK") != std::string::npos && message.find("NICK") == 0)
 	{
 		std::cout << "in nick" << std::endl;
 		this->ft_nick(message, client);
 	}
-	else if (message.find("!bot") != std::string::npos && message.find("!bot") == 0)
+	if (message.find("!bot") != std::string::npos && message.find("PRIVMSG") == 0)
 	{
 		std::string query = message.substr(5);
 		std::cout << "Requête Bot : " << query << std::endl;
-		start_bot(query);
+		start_bot(query, client);
 	}
 }
 
@@ -141,7 +141,7 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 					std::cout << "Removing channel from client" << std::endl;
 					(void)message;
 					client.RemoveChannel(channelName);
-					std::string reply = ":" + client.GetNickname() + "!" + client.GetUsername() + "@localhost" + " PART " + channelName + "\r\n";
+					std::string reply = ":" + client.GetNickname() + " PART " + channelName + " " + message + "\r\n";
 					std::cout << "Reply : " << reply << std::endl;
 					channelToLeave->broadcastMessageToAll(reply);
 					if (channelToLeave->getUsers().size() == 0)

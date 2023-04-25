@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/20 01:44:45 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/23 21:16:13 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 17:32:28 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ void	Server::ft_kick( std::string command, Client &sender )
 	// check whether sender is an admin in that channel 
 	try
 	{
-		if (channel->isUserOp(*target) == false) // it means user isn't an op
+		if (channel->isUserOp(sender) == false) // it means user isn't an op
 		{
 			std::cout << "you're not an admin lmfaooo" << std::endl; // test
 			handleReplies(ERR_CHANOPRIVSNEEDED, channelName, NULL, sender);
