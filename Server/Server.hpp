@@ -41,7 +41,6 @@ public:
 	bool	is_good_infos(std::string message, int clientSocket);
 	bool	channelExist(std::string channelName);
 	bool	nicknameExist(std::string nickname);
-
 	Channel	*findChanByName( std::string channelName );
 	Client	*findUserByNick( std::string nick );
 
