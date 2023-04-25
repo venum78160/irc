@@ -69,7 +69,7 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
             if (params[2][i] == 'o') {
                 if (nicknameExist(params[i + 2])) {
                     channel->giveOpRights(getClientByNickname(params[i + 2]));
-                    std::string reply = ": 324 " + client.GetNickname() + " " + channel->getName() + " +o\r\n";
+                    std::string reply = ":"+ client.GetNickname() +  " MODE "  + channel->getName() + " +o\r\n";
                     send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                 }
                 else {
@@ -82,7 +82,7 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
                     int limit = std::atoi(params[i + 2].c_str());
                     if (limit > 0 && limit < 100) {
                         channel->setUserLimit(limit);
-                        std::string reply = ": 324 " + client.GetNickname() + " " + channel->getName() + " +l\r\n";
+                        std::string reply = ":"+ client.GetNickname() +  " MODE "  + channel->getName() + " +l\r\n";
                         send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                     }
                      else {
@@ -118,7 +118,7 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
             if (params[2][i] == 'o') {
                 if (nicknameExist(params[i + 2])) {
                     channel->removeOpRights(getClientByNickname(params[i + 2]));
-                    std::string reply = ": 324 " + client.GetNickname() + " " + channel->getName() + " -o\r\n";
+                    std::string reply = ":"+ client.GetNickname() +  " MODE "  + channel->getName() + " -o\r\n";
                     send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                 }
                 else {
@@ -128,13 +128,13 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
             }
             if (params[2][i] == 'l') {
                 channel->setUserLimit(-1);
-                std::string reply = ": 324 " + client.GetNickname() + " " + channel->getName() + " -l\r\n";
+                std::string reply = ":"+ client.GetNickname() +  " MODE "  + channel->getName() + " -l\r\n";
                 send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
             }
             if (params[2][i] == 'b') {
                 if (channel->isInBlacklist(params[i + 2])) {
                     channel->removeToBlacklist(params[i + 2]);
-                    std::string reply = ": 324 " + client.GetNickname() + " " + channel->getName() + " -b\r\n";
+                    std::string reply = ":"+ client.GetNickname() +  " MODE "  + channel->getName() + " -b\r\n";
                     send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                 }
                 else
