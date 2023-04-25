@@ -111,48 +111,53 @@ std::string get_weather(const char* city, const char* key) {
 void    display_weather(std::string id, Client &client)
 {
     std::istringstream iss(id);
+    std::string print;
     int idit;
      iss >> idit;
     if (idit >= 200 && idit <= 232)
     {
-        print_ThunderyHeavyRai();
-        SendBot(get_ThunderyHeavyRai(), client);
+        // print_ThunderyHeavyRai();
+        print = get_ThunderyHeavyRai();
     }
     else if (idit >= 300 && idit <= 321)
     {
-        print_fog();
-        SendBot(get_fog(), client);
+        // print_fog();
+        print = get_fog();
         
     }
     else if (idit >= 500 && idit <= 531)
     {
-        print_heavy_rain();
-        SendBot(get_heavy_rain(), client);
+        // print_heavy_rain();
+        print = get_heavy_rain();
     }
     else if (idit >= 600 && idit <= 622)
     {
-        print_heavy_snow();
-        SendBot(get_heavy_snow(), client);
+        // print_heavy_snow();
+        print = get_heavy_snow();
     }
     else if (idit >= 700 && idit <= 781)
     {
-        print_heavy_snow_showers();
-        SendBot(get_heavy_snow_showers(), client);
+        // print_heavy_snow_showers();
+        print = get_heavy_snow_showers();
     }
     else if (idit == 800)
     {
-        // print_sunny();
-        SendBot(get_sunny(), client);
+        print_sunny();
+        print = get_sunny();
     }
     else if (idit >= 801 && idit <= 804)
     {
-        print_cloudy();
-        SendBot(get_cloudy(), client);
+        // print_cloudy();
+        print = get_cloudy();
     }
     else
     {
-        print_unknown();
-        SendBot(get_unknown(), client);
+        // print_unknown();
+        print = get_unknown();
+    }
+    std::vector<std::string> vec = splitStr(print, '\n');
+    for (std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); ++it) {
+        SendBot(*it, client);
     }
 }
 
