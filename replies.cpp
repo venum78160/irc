@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/16 15:48:48 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 17:55:40 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 21:20:39 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,6 @@ void	parsingErrors( int code, std::string &param, std::string &reply )
 	else if (code == ERR_NICKNAMEINUSE)
 		reply.append(param + ":Nickname is already in use\r\n");
 }
-
 
 
 void	Server::handleReplies( int code, std::string param, Channel *chan, Client &target )

@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 19:10:36 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 21:12:54 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,9 +53,16 @@ void	Server::handleMessage(std::string message, Client &client)
 		// std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
 		this->ft_join(message, client);
 	}
-	else if (message.find("PRIVMSG") != std::string::npos && message.find("PRIVMSG") == 0)
+	else if ((message.find("PRIVMSG") != std::string::npos && message.find("PRIVMSG") == 0)
+			|| (message.find("NOTICE") != std::string::npos && message.find("NOTICE") == 0))
 	{
 		std::cout << "in privmsg" << std::endl;
+		if ((message.find("PRIVMSG") != std::string::npos && message.size() < 8) 
+			|| (message.find("NOTICE") != std::string::npos && message.size() < 7))// pour éviter le segfault
+		{
+			handleReplies(ERR_NORECIPIENT, "privmsg", NULL, client);
+			return ;
+		}
 		std::string privmsg = message.substr(message.find("PRIVMSG") + 8, message.size()); // attention au segfault
 		this->ft_privMsg(privmsg, client);
 	}
@@ -104,12 +111,6 @@ void	Server::handleMessage(std::string message, Client &client)
 		std::cout << "in nick" << std::endl;
 		this->ft_nick(message, client);
 	}
-	// if (message.find("!bot") != std::string::npos && message.find("PRIVMSG") == 0)
-	// {
-	// 	std::string query = message.substr(5);
-	// 	std::cout << "Requête Bot : " << query << std::endl;
-	// 	start_bot(query, client);
-	// }
 }
 
 void Server::partCommand(std::string channelName, Client &client, std::string message)
@@ -215,4 +216,3 @@ void Server::modeCommand(Client &client, std::string message)
 		}
 	}
 }
-

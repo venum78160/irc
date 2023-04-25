@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 16:23:42 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 18:49:05 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 21:09:39 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,18 +79,13 @@ void	Server::ft_privMsg( std::string command, Client &sender )
 	std::string message = ":" + sender.getFullId() + " PRIVMSG " + command;
 	std::string target = params[0];
 
-	// std::cout << "target = [" << target << "]" << std::endl;
-	// std::cout << "formated message = [" << message << "]" << std::endl;
-
 	// check validity of target
 	// checkValidity(target);
 	if (target[0] == '#')
 		notifyChannel(target, message, sender);
 	else if (!target.compare("!bot"))
 	{
-		// std::cout << "Command : [" << command << "]" << std::endl;
 		std::string botQuery = command.substr(command.find_first_of(":") + 1);
-		// std::cout << "botQuery = [" << botQuery << "]" << std::endl;
 		start_bot(botQuery, sender);
 	}
 	else
