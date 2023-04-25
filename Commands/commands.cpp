@@ -6,7 +6,7 @@
 /*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/24 19:33:15 by anggonza         ###   ########.fr       */
+/*   Updated: 2023/04/25 14:29:02 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,11 +59,11 @@ void	Server::handleMessage(std::string message, Client &client)
 		std::string privmsg = message.substr(message.find("PRIVMSG") + 8, message.size()); // attention au segfault
 		this->ft_privMsg(privmsg, client);
 	}
-	// if (message.find("MODE") != std::string::npos && message.find("MODE") == 0)
-	// {
-	//	 std::cout << "in mode" << std::endl;
-	//	 this->modeCommand(client, message);
-	// }
+	if (message.find("MODE") != std::string::npos && message.find("MODE") == 0)
+	{
+		std::cout << "in mode" << std::endl;
+		this->modeCommand(client, message);
+	}
 	if (message.find("PING") != std::string::npos && message.find("PING") == 0)
 	{
 		std::cout << "in ping" << std::endl;
@@ -139,7 +139,7 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 				std::cout << "Client channel : " << client.GetChannels()[i] << std::endl;
 				if (client.GetChannels()[i] == channelName)
 				{
-					std::cout << "Removing channel from client";
+					std::cout << "Removing channel from client" << std::endl;
 					client.RemoveChannel(channelName);
 					std::string reply = ":" + client.GetNickname() + " PART " + channelName + " :" + message + "\r\n";
 					std::cout << "Reply : " << reply << std::endl;
@@ -148,6 +148,8 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 					{
 						send(it->first.GetSocketFD(), reply.c_str(), reply.size(), 0);
 					}
+					send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+					reply = ":127.0.0.1 442" + client.GetNickname() + " " + channelName + " :You're not on that channel\r\n";
 					send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 					return ;
 				}
