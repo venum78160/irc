@@ -70,3 +70,4 @@ void						removeNewlinesAndDoubleSpaces(std::string& str);
 std::vector<std::string> 	splitStr( std::string str, char sep );
 std::string					ft_itoa( int number );
 std::vector<std::string> 	splitOnFirstSpace( std::string str );
+void	sendReply( Client &client, std::string reply);

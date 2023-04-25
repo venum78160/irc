@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   replies.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: vl-hotel <vl-hotel@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/16 15:48:48 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/24 18:20:43 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 16:13:25 by vl-hotel         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ void	parsingErrors( int code, std::string &param, std::string &reply )
 		reply.append(param + ":Nickname is already in use\r\n");
 }
 
-void	sendReply( Client &client, std::string reply )
+void	sendReply( Client &client, std::string reply)
 {
 	send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 }
