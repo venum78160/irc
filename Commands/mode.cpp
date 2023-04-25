@@ -101,10 +101,12 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
             if (params[2][i] == 'b') {
                 if (!channel->isInBlacklist(params[i + 2])) {
                     channel->addToBlacklist(params[i + 2]);
+					std::cout << "blacklist: " << params[i + 2] << std::endl;
+					params[i + 2].erase(params[i + 2].size() - 2, 2);
                     std::string reply = ":"+ client.GetNickname() +  " MODE "  + channel->getName() + " +b\r\n";
-                    std::cout << reply << std::endl;
-					send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
-                }
+					std::cout << "reply : " << reply << std::endl;
+					channel->broadcastMessageToAll(reply);
+				}
                 else {
                     std::string reply = ": 437 " + client.GetNickname() + " " + params[i + 2] + " :is already banned\r\n";
                     send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
