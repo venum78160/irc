@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 18:07:25 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 19:10:36 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void	Server::handleMessage(std::string message, Client &client)
 	{
 		std::vector<std::string>	params = split(message, ' ');
 		std::string channelName = params[1];
-		std::string message = "No reason specified";
+		std::string message = ":No reason specified";
 		// check if PART #channel message\r\n or PART #channel\r\n
 		if (params.size() > 2)
 			message = params[2];
@@ -125,7 +125,6 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 		channelName = channelName.substr(0, channelName.find("\r\n"));
 	// 2
 	Channel *channelToLeave;
-
 	//find channel in _channels by channelName in c++98
 	std::vector<Channel*>::iterator it;
 	for (it = _channels.begin(); it != _channels.end(); ++it)
@@ -133,7 +132,6 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 		if ((*it)->getName() == channelName) // channel trouvé dans le vector
 		{
 			channelToLeave = *it;
-			channelToLeave->removeUser(client);
 			for (size_t i = 0; i < client.GetChannels().size(); i++)
 			{
 				std::cout << "Client channel : " << client.GetChannels()[i] << std::endl;
@@ -141,26 +139,20 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 				{
 					std::cout << "Removing channel from client" << std::endl;
 					client.RemoveChannel(channelName);
-					std::string reply = ":" + client.GetNickname() + " PART " + channelName + " " + message + "\r\n";
+					std::string reply = ":" + client.getFullId() + " PART " + channelName + " " + message + "\r\n";
 					std::cout << "Reply : " << reply << std::endl;
-					std::map<Client, bool>connectedClients = channelToLeave->getUsers();
-					for (std::map<Client, bool>::iterator it = connectedClients.begin(); it != connectedClients.end(); ++it)
+					channelToLeave->broadcastMessageToAll(reply);
+					channelToLeave->removeUser(client);
+					if (channelToLeave->getUsers().size() == 0)
 					{
-						send(it->first.GetSocketFD(), reply.c_str(), reply.size(), 0);
+						std::cout << "Removing channel from server" << std::endl;
+						_channels.erase(it);
+						delete channelToLeave;
 					}
-					send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
-					reply = ":127.0.0.1 442" + client.GetNickname() + " " + channelName + " :You're not on that channel\r\n";
-					send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 					return ;
 				}
 			}
 			// if channel empty remove it
-			if (channelToLeave->getUsers().size() == 0)
-			{
-				std::cout << "Removing channel from server" << std::endl;
-				_channels.erase(it);
-				delete channelToLeave;
-			}
 		}
 	}
 	handleReplies(ERR_NOSUCHCHANNEL, channelName, NULL, client);
