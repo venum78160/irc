@@ -47,7 +47,7 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
     Channel *channel = this->getChannelByName(params[1]);
     std::map<Client, bool> users = channel->getUsers();
     if (client.GetServername() != channel->getName()) {
-        std::string reply = ":127.0.0.1 " + client.GetNickname() + " 442 " + client.GetNickname() + " " + channel->getName() + " :You're not on that channel\r\n";
+        std::string reply = ":127.0.0.1 442 " + client.GetNickname() + " " + channel->getName() + " :You're not on that channel\r\n";
         send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
         return;
     }
@@ -190,11 +190,12 @@ void Server::executeModeUsers(Client &client, std::vector<std::string> &params)
                     channel->broadcastMessageToAll(reply);
 					reply = ":127.0.0.1 324 " + client.GetNickname() + " " + channel->getName() + " :You're no longer channel operator\r\n";
 					send(getClientByNickname(params[i + 2]).GetSocketFD(), reply.c_str(), reply.size(), 0);
-                }
-                else
-                    handleReplies(ERR_CHANOPRIVSNEEDED, channel->getName(), NULL, client);
-            }
+            		handleReplies(RPL_NAMREPLY, "", channel, client);
+				}
+				else
+					handleReplies(ERR_CHANOPRIVSNEEDED, channel->getName(), NULL, client);
+			}
 		}
 	}
-    return ;
+	return ;
 }

@@ -98,6 +98,7 @@ void	Server::eventClient(Client *client)
 	if (buffer.find('\n') == std::string::npos)
 		return ;
 	this->handleMessage(buffer, *client);
+	client->SetBuffer("");
 	return ;
 }
 
