@@ -103,7 +103,7 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
                     channel->addToBlacklist(params[i + 2]);
 					params[i + 2].erase(params[i + 2].size() - 2, 2);
                     std::string reply = ":"+ client.GetNickname() +  " MODE "  + channel->getName() + " +b\r\n";
-					std::cout << "reply : " << reply << std::endl;
+					// std::cout << "reply : " << reply << std::endl;
 					send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 					this->partCommand(channel->getName(), getClientByNickname(params[i + 2]), "Got banned");
 				}

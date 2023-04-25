@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   kick.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/20 01:44:45 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 18:26:15 by anggonza         ###   ########.fr       */
+/*   Updated: 2023/04/25 21:34:13 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,6 @@ void	Server::ft_kick( std::string command, Client &sender )
 	channel = findChanByName(channelName);
 	if (channel == NULL) // channel doesn't exist
 	{
-		std::cout << "Channel doesn't exist" << std::endl; // test
 		handleReplies(ERR_NOSUCHCHANNEL, channelName, NULL, sender);
 		return ;
 	}
@@ -83,7 +82,7 @@ void	Server::ft_kick( std::string command, Client &sender )
 	{
 		if (channel->isUserOp(sender) == false) // it means user isn't an op
 		{
-			std::cout << "you're not an admin lmfaooo" << std::endl; // test
+			std::cout << "User is not an admin" << std::endl; // test
 			handleReplies(ERR_CHANOPRIVSNEEDED, channelName, NULL, sender);
 			return ;
 		}
@@ -94,7 +93,7 @@ void	Server::ft_kick( std::string command, Client &sender )
 	{
 		if (!strcmp(e.what(), "ERR_NOTONCHANNEL"))
 		{
-			std::cout << "you're not even in the channel..." << std::endl; // test
+			std::cout << "User is not even in the channel..." << std::endl; // test
 			handleReplies(ERR_NOTONCHANNEL, channelName, NULL, sender);
 			return ;
 		}

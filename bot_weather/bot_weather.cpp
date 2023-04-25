@@ -172,7 +172,6 @@ void	start_bot(std::string request, Client &client)
 	display_weather(result["id"], client);
 	if(result.size() < 5)
 	{
-		std::cout << "city not found" << std::endl;
 		SendBot("city not found", client);
 	}
 	else

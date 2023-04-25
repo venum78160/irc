@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/16 15:48:48 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 21:20:39 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 21:31:45 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,12 @@ void	successReplies( int code, Channel &param, std::string &reply )
 				reply.append(it->first.GetNickname() + " ");
 		}
 		reply.append("\r\n");
-		std::cout << "reply: " << reply << std::endl;
 	}
 	else if (code == RPL_ENDOFNAMES)
 	{
 		std::string chan = param.getName();
 		reply.append(chan + " :End of /NAMES list\r\n");
-		std::cout << "RPLENDOFNAMES reply: " << reply << std::endl;
+		// std::cout << "RPLENDOFNAMES reply: " << reply << std::endl;
 	}
 }
 

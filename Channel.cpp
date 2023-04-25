@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 17:37:34 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 21:31:33 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ void Channel::sendMessage( std::string &message, Client const &receiver )
 	int 			clientSocket = receiver.GetSocketFD();
 	// unsigned int	msgLen = message.size();
 
-	std::cout << "sending message to " << receiver.GetNickname() << std::endl;
 	send(clientSocket, message.c_str(), message.size(), 0);
 }
 
@@ -126,7 +125,6 @@ void Channel::giveOpRights( Client user )
 
 	if (it != (this->_users).end())
 	{
-		std::cout << "found user " << user.GetNickname() << " " << it->second << std::endl;
 		it->second = true;
 	}
 }
@@ -204,8 +202,6 @@ bool Channel::isUserOp( Client &user )
 	{
 		if (!((it->first).GetNickname()).compare(targetNick))
 		{
-			std::cout << "user = " << user.GetNickname() << "and it = " << it->first.GetNickname() << std::endl;
-			std::cout << "isUserOp: " << it->first.GetNickname() << it->second << std::endl;
 			return (it->second);
 		}
 	}

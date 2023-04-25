@@ -18,7 +18,7 @@ void	Server::run()
             std::cerr << "Timeout while waiting for events" << std::endl;
             break;
         }
-		std::cout << "-------je suis apres dans le poll" << std::endl;
+		// std::cout << "-------je suis apres dans le poll" << std::endl;
         // Parcours de la liste des descripteurs de fichiers surveillés
         for (size_t i = 0; i < _pollFds.size(); i++)
         {

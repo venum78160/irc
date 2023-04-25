@@ -89,7 +89,7 @@ void	Server::eventClient(Client *client)
 	std::string message = recvAllData(client->GetSocketFD());
 	if (message == "DISCONNECTED")
 		return ;
-	std::cout << "[event client] Message reçu : |" << message << "|" <<std::endl;
+	// std::cout << "[event client] Message reçu : |" << message << "|" <<std::endl;
 	// Remplir le vecteur buffer_ de la classe client avec le contenu de message
 	// client->printclientInfo();
 	std::string newBuffer = client->GetBuffer() + message;
@@ -105,20 +105,6 @@ bool Server::isClientAdded(int fd) const
 {
 	return _MClient.find(fd) != _MClient.end();
 }
-
-// void Server::handleRequestError( int error, Client &user ) const
-// {
-// 	std::string reply;
-
-// 	if (error == NOTENOUGHPARAMS)
-// 		reply = ":127.0.0.1 461 " + user.GetNickname() + " :Not enough parameters\r\n";
-// 	else if (error == NAMETOOLONG)
-// 		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name too long\r\n";
-// 	else if (error == WRONGNAME)
-// 		reply = ":127.0.0.1 479 " + user.GetNickname() + " :Channel name contains illegal characters\r\n";
-
-// 	send(user.GetSocketFD(), reply.c_str(), reply.size(), 0);
-// }
 
 int Server::checkNameValidity( std::string &name )
 {

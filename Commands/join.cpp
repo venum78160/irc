@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 18:28:57 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 17:49:41 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 21:33:41 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,9 +81,9 @@ void	Server::createChannel(std::string channelName, Client &client)
 	Channel *newChannel = new Channel(channelName, client);
 	newChannel->addUser(client);
 	_channels.push_back(newChannel);
-	std::cout << "Channel successfully created: " << channelName << std::endl; // test only, to delete later
+	// std::cout << "Channel successfully created: " << channelName << std::endl; // test only, to delete later
 	joinChannel(newChannel, client);
-	std::cout << "giving op rights" << std::endl;
+	// std::cout << "giving op rights" << std::endl;
 	newChannel->giveOpRights(client);
 }
 
@@ -154,11 +154,9 @@ void	Server::ft_join(std::string message, Client &client)
 {
 	std::transform(message.begin(), message.end(), message.begin(), ::tolower);
 
-	std::cout << "join message: " << message << std::endl; // test only, to delete later
 	std::vector<std::string> params = splitStr(message, ' ');
 	if (params.size() < 2) // check if there is enough params
 	{
-		std::cout << "not enough params" << std::endl; // test only, to delete later
 		handleReplies(ERR_NEEDMOREPARAMS, "join", NULL, client);
 		return ;
 	}
@@ -174,7 +172,6 @@ void	Server::ft_join(std::string message, Client &client)
 			channelName.erase(channelName.size() - 1, std::string::npos);
 		if (channelName[channelName.size() - 1] == '\r')
 			channelName.erase(channelName.size() - 1, std::string::npos);
-		std::cout << "testing channel: [" << channelName << "]" << std::endl; // test only, to delete later
 		if (!channelName.compare("0"))
 		{
 			joinChannel(NULL, client);
@@ -193,17 +190,7 @@ void	Server::ft_join(std::string message, Client &client)
 		}
 		if (it2 == ite2) // channel doesn't exist so we create it
 		{
-			std::cout << "creating channel: " << channelName << std::endl; // test only, to delete later
 			createChannel(channelName, client);
 		}
 	}
-	// std::cout << "---------- PRINTING CHANNEL LIST ----------" << std::endl;
-	// std::vector<Channel *>::iterator it3;
-	// 	std::vector<Channel *>::iterator ite3 = _channels.end();
-	// 	for (it3 = _channels.begin(); it3 != ite3; it3++)
-	// 	{
-	// 		std::string name = (*it3)->getName();
-	// 		std::cout << "Channel: " << name << std::endl;
-	// 	}
-	// std::cout << "END OF LIST." << std::endl;
 }

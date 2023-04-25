@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 16:23:42 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 21:09:39 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 21:35:04 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,10 @@ void	Server::sendPrivMsg( std::string targetNick, std::string &message, Client &
 	}
 	if (it == ite || target == NULL) // no such client
 	{
-		std::cout << "no such client" << std::endl;
+		// std::cout << "no such client" << std::endl;
 		handleReplies(ERR_NOSUCHNICK, targetNick, NULL, sender);
 		return ;
 	}
-	std::cout << "sending msg to client: " << message << std::endl;
 	send(target->GetSocketFD(), message.c_str(), message.size(), 0);
 }
 
@@ -52,17 +51,15 @@ void	Server::notifyChannel( std::string channelName, std::string &msg, Client &s
 	}
 	if (it == ite || targetChannel == NULL) // channel not found
 	{
-		std::cout << "no such channel" << std::endl;
+		// std::cout << "no such channel" << std::endl;
 		handleReplies(ERR_NOSUCHNICK, channelName, NULL, sender);
 		return ;
 	}
-	std::cout << "sending msg to channel" << std::endl;
 	targetChannel->broadcastMessage(msg, sender);
 }
 
 void	Server::ft_privMsg( std::string command, Client &sender )
 {
-	std::cout << "privmsg message: [" << command << "]" << std::endl; // test only, to delete later
 	if (command.find(" ") == std::string::npos)
 	{
 		handleReplies(ERR_NORECIPIENT, "privmsg", NULL, sender);
@@ -90,7 +87,6 @@ void	Server::ft_privMsg( std::string command, Client &sender )
 	}
 	else
 	{
-		std::cout << "Message : [" << message << "]" << std::endl;
 		sendPrivMsg(target, message, sender);
 	}
 }

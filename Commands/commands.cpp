@@ -6,41 +6,9 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 21:12:54 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 21:43:21 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
-// /create nom_channel
-// Créé un nouveau channel avec pour nom nom_channel,
-
-// /join nom_channel
-// Rejoint le channel nom_channel,
-
-// /rename nom_channel nouveau_nom
-// Renomme le channel nom_channel en nouveau_nom,
-
-// /part nom_channel
-// Quitte le channel nom_channel,
-
-// /delete nom_channel
-// Supprime le channel nom_channel,
-
-// /nick nouveau_nom
-// Renomme l'utilisateur en nouveau_nom,
-
-// /users
-// Affiche la liste des utilisateurs connectés au channel / serveur,
-
-// /list [string]
-// Affiche la liste des channels disponibles. Si string est donné en paramètre, affiche la liste des channels contenant string dans leur nom,
-
-// /msg nom_utilisateur message
-// Envoie message à nom_utilisateur,
-// message
-// Envoie un message dans le channel courant.
-// kick un utilisateur
-// BAn un utilisateur
 
 #include "../ft_irc.hpp"
 
@@ -49,14 +17,13 @@ void	Server::handleMessage(std::string message, Client &client)
 	std::cout << "Message : " << message << " from " << client << std::endl;
 	if (message.find("JOIN") != std::string::npos && message.find("JOIN") == 0)
 	{
-		std::cout << "in join" << std::endl;
-		// std::string channelName = message.substr(message.find("JOIN") + 5, message.size());
+		// std::cout << "in join" << std::endl;
 		this->ft_join(message, client);
 	}
 	else if ((message.find("PRIVMSG") != std::string::npos && message.find("PRIVMSG") == 0)
 			|| (message.find("NOTICE") != std::string::npos && message.find("NOTICE") == 0))
 	{
-		std::cout << "in privmsg" << std::endl;
+		// std::cout << "in privmsg" << std::endl;
 		if ((message.find("PRIVMSG") != std::string::npos && message.size() < 8) 
 			|| (message.find("NOTICE") != std::string::npos && message.size() < 7))// pour éviter le segfault
 		{
@@ -68,18 +35,18 @@ void	Server::handleMessage(std::string message, Client &client)
 	}
 	else if (message.find("MODE") != std::string::npos && message.find("MODE") == 0)
 	{
-		std::cout << "in mode" << std::endl;
+		// std::cout << "in mode" << std::endl;
 		this->modeCommand(client, message);
 	}
 	else if (message.find("PING") != std::string::npos && message.find("PING") == 0)
 	{
-		std::cout << "in ping" << std::endl;
+		// std::cout << "in ping" << std::endl;
 		std::string reply = "PONG " + message.substr(5);
 		send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 	}
 	else if (message.find("KICK") != std::string::npos && message.find("KICK") == 0)
 	{
-		std::cout << "in kick" << std::endl;
+		// std::cout << "in kick" << std::endl;
 		if (message.size() < 6) // pour éviter le segfault
 		{
 			handleReplies(ERR_NEEDMOREPARAMS, "KICK", NULL, client);
@@ -90,7 +57,7 @@ void	Server::handleMessage(std::string message, Client &client)
 	}
 	else if (message.find("TOPIC") != std::string::npos && message.find("TOPIC") == 0)
 	{
-		std::cout << "in topic" << std::endl;
+		// std::cout << "in topic" << std::endl;
 		this->ft_topic(message, client);
 	}
 	else if (message.find("PART") != std::string::npos && message.find("PART") == 0)
@@ -101,14 +68,14 @@ void	Server::handleMessage(std::string message, Client &client)
 		// check if PART #channel message\r\n or PART #channel\r\n
 		if (params.size() > 2)
 			message = params[2];
-		std::cout << "in part" << std::endl;
-		std::cout << "channelName : " << channelName << std::endl;
-		std::cout << "message : " << message << std::endl;
+		// std::cout << "in part" << std::endl;
+		// std::cout << "channelName : " << channelName << std::endl;
+		// std::cout << "message : " << message << std::endl;
 		this->partCommand(channelName ,client, message);
 	}
 	else if (message.find("NICK") != std::string::npos && message.find("NICK") == 0)
 	{
-		std::cout << "in nick" << std::endl;
+		// std::cout << "in nick" << std::endl;
 		this->ft_nick(message, client);
 	}
 }
@@ -135,18 +102,18 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 			channelToLeave = *it;
 			for (size_t i = 0; i < client.GetChannels().size(); i++)
 			{
-				std::cout << "Client channel : " << client.GetChannels()[i] << std::endl;
+				// std::cout << "Client channel : " << client.GetChannels()[i] << std::endl;
 				if (client.GetChannels()[i] == channelName)
 				{
-					std::cout << "Removing channel from client" << std::endl;
+					// std::cout << "Removing channel from client" << std::endl;
 					client.RemoveChannel(channelName);
 					std::string reply = ":" + client.getFullId() + " PART " + channelName + " " + message + "\r\n";
-					std::cout << "Reply : " << reply << std::endl;
+					// std::cout << "Reply : " << reply << std::endl;
 					channelToLeave->broadcastMessageToAll(reply);
 					channelToLeave->removeUser(client);
 					if (channelToLeave->getUsers().size() == 0)
 					{
-						std::cout << "Removing channel from server" << std::endl;
+						// std::cout << "Removing channel from server" << std::endl;
 						_channels.erase(it);
 						delete channelToLeave;
 					}
@@ -180,7 +147,6 @@ void Server::quitCommand(Client &client, std::string message)
 		}
 	}
 	this->removeClient(client.GetSocketFD());
-	std::cout << "Successfully quitted " << std::endl; // test only, to delete later
 }
 
 void Server::modeCommand(Client &client, std::string message)
