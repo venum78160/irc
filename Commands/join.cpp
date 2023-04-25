@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   join.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 18:28:57 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 17:49:41 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 18:59:09 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@
 
 void	Server::createChannel(std::string channelName, Client &client)
 {
-	
+
 	Channel *newChannel = new Channel(channelName, client);
 	newChannel->addUser(client);
 	_channels.push_back(newChannel);
@@ -108,16 +108,10 @@ bool	Server::joinErrors(Channel *channel, Client &client)
 	}
 	// check if user is banned
 	std::string	clientNick = client.GetNickname();
-	std::vector<std::string> blacklist = channel->getBlacklist();
-	std::vector<std::string>::iterator it;
-	std::vector<std::string>::iterator ite = blacklist.end();
-	for (it = blacklist.begin(); it != ite; it++)
+	if (channel->isInBlacklist(clientNick))
 	{
-		if (!(*it).compare(clientNick))
-		{
 			handleReplies(ERR_BANNEDFROMCHAN, channel->getName(), NULL, client);
 			return (true);
-		}
 	}
 	// check if channel is full
 	if (channel->getUserLimit() > -1 && channel->getNbUsers() >= channel->getUserLimit())
