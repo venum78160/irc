@@ -6,7 +6,7 @@
 /*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 14:29:02 by anggonza         ###   ########.fr       */
+/*   Updated: 2023/04/25 16:54:56 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,6 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 		channelName = channelName.substr(0, channelName.find("\r\n"));
 	// 2
 	Channel *channelToLeave;
-
 	//find channel in _channels by channelName in c++98
 	std::vector<Channel*>::iterator it;
 	for (it = _channels.begin(); it != _channels.end(); ++it)
@@ -140,27 +139,21 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 				if (client.GetChannels()[i] == channelName)
 				{
 					std::cout << "Removing channel from client" << std::endl;
+					(void)message;
 					client.RemoveChannel(channelName);
-					std::string reply = ":" + client.GetNickname() + " PART " + channelName + " :" + message + "\r\n";
+					std::string reply = ":" + client.GetNickname() + "!" + client.GetUsername() + "@localhost" + " PART " + channelName + "\r\n";
 					std::cout << "Reply : " << reply << std::endl;
-					std::map<Client, bool>connectedClients = channelToLeave->getUsers();
-					for (std::map<Client, bool>::iterator it = connectedClients.begin(); it != connectedClients.end(); ++it)
+					channelToLeave->broadcastMessageToAll(reply);
+					if (channelToLeave->getUsers().size() == 0)
 					{
-						send(it->first.GetSocketFD(), reply.c_str(), reply.size(), 0);
+						std::cout << "Removing channel from server" << std::endl;
+						_channels.erase(it);
+						delete channelToLeave;
 					}
-					send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
-					reply = ":127.0.0.1 442" + client.GetNickname() + " " + channelName + " :You're not on that channel\r\n";
-					send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
 					return ;
 				}
 			}
 			// if channel empty remove it
-			if (channelToLeave->getUsers().size() == 0)
-			{
-				std::cout << "Removing channel from server" << std::endl;
-				_channels.erase(it);
-				delete channelToLeave;
-			}
 		}
 	}
 	handleReplies(ERR_NOSUCHCHANNEL, channelName, NULL, client);
