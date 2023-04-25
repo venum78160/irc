@@ -84,22 +84,26 @@ void Server::removeClient(int fd)
     }
 }
 
-void	Server::eventClient(Client *Client)
+void	Server::eventClient(Client *client)
 {
-    std::string message = recvAllData(Client->GetSocketFD());
-    if (message == "DISCONNECTED")
-        return ;
-    std::cout << "[event Client] Message reçu : |" << message << "|" <<std::endl;
-    // Remplir le vecteur buffer_ de la classe Client avec le contenu de message
-    Client->SetBuffer(message);
-    // Client->printClientInfo();
-    this->handleMessage(message, *Client);
-    return ;
+	std::string message = recvAllData(client->GetSocketFD());
+	if (message == "DISCONNECTED")
+		return ;
+	std::cout << "[event client] Message reçu : |" << message << "|" <<std::endl;
+	// Remplir le vecteur buffer_ de la classe client avec le contenu de message
+	// client->printclientInfo();
+	std::string newBuffer = client->GetBuffer() + message;
+	client->SetBuffer(newBuffer);
+	std::string buffer = client->GetBuffer();
+	if (buffer.find('\n') == std::string::npos)
+		return ;
+	this->handleMessage(buffer, *client);
+	return ;
 }
 
 bool Server::isClientAdded(int fd) const
 {
-    return _MClient.find(fd) != _MClient.end();
+	return _MClient.find(fd) != _MClient.end();
 }
 
 // void Server::handleRequestError( int error, Client &user ) const
