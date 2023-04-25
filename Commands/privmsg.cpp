@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 16:23:42 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/23 20:48:45 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 18:49:05 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,11 @@ void	Server::sendPrivMsg( std::string targetNick, std::string &message, Client &
 	}
 	if (it == ite || target == NULL) // no such client
 	{
+		std::cout << "no such client" << std::endl;
 		handleReplies(ERR_NOSUCHNICK, targetNick, NULL, sender);
 		return ;
 	}
+	std::cout << "sending msg to client: " << message << std::endl;
 	send(target->GetSocketFD(), message.c_str(), message.size(), 0);
 }
 
@@ -54,7 +56,7 @@ void	Server::notifyChannel( std::string channelName, std::string &msg, Client &s
 		handleReplies(ERR_NOSUCHNICK, channelName, NULL, sender);
 		return ;
 	}
-	
+	std::cout << "sending msg to channel" << std::endl;
 	targetChannel->broadcastMessage(msg, sender);
 }
 
@@ -84,6 +86,16 @@ void	Server::ft_privMsg( std::string command, Client &sender )
 	// checkValidity(target);
 	if (target[0] == '#')
 		notifyChannel(target, message, sender);
+	else if (!target.compare("!bot"))
+	{
+		// std::cout << "Command : [" << command << "]" << std::endl;
+		std::string botQuery = command.substr(command.find_first_of(":") + 1);
+		// std::cout << "botQuery = [" << botQuery << "]" << std::endl;
+		start_bot(botQuery, sender);
+	}
 	else
+	{
+		std::cout << "Message : [" << message << "]" << std::endl;
 		sendPrivMsg(target, message, sender);
+	}
 }

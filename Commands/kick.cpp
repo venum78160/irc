@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   kick.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
+/*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/20 01:44:45 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/23 21:16:13 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 18:26:15 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,20 +78,17 @@ void	Server::ft_kick( std::string command, Client &sender )
 		handleReplies(ERR_USERNOTINCHANNEL, targetNick + " " + channelName, NULL, sender);
 		return ;
 	}
-	// check whether sender is an admin in that channel 
+	// check whether sender is an admin in that channel
 	try
 	{
-		if (channel->isUserOp(*target) == false) // it means user isn't an op
+		if (channel->isUserOp(sender) == false) // it means user isn't an op
 		{
 			std::cout << "you're not an admin lmfaooo" << std::endl; // test
 			handleReplies(ERR_CHANOPRIVSNEEDED, channelName, NULL, sender);
 			return ;
 		}
 		else // user is indeed an op : can proceed
-		{
 			std::cout << "user successfully kicked" << std::endl; // test
-			channel->removeUser(*target);
-		}
 	}
 	catch (std::exception &e) // it means user isn't even in channel
 	{
@@ -103,5 +100,6 @@ void	Server::ft_kick( std::string command, Client &sender )
 		}
 	}
 	kickReplies(sender, *target, *channel, kickReason);
+	this->partCommand(channelName, *target, "Kicked from channel");
 	// handle replies
 }

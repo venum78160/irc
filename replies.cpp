@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   replies.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vl-hotel <vl-hotel@student.42.fr>          +#+  +:+       +#+        */
+/*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/16 15:48:48 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 16:13:25 by vl-hotel         ###   ########.fr       */
+/*   Updated: 2023/04/25 17:55:40 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,11 @@
 		
 // }
 
+void	sendReply( Client &client, std::string reply)
+{
+	send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+}
+
 void	successReplies( int code, Channel &param, std::string &reply )
 {
 	if (code == RPL_TOPIC)
@@ -27,13 +32,13 @@ void	successReplies( int code, Channel &param, std::string &reply )
 		std::string chan = param.getName();
 		std::string topic = param.getTopic();
 		reply.append(chan + " :" + topic + "\r\n");
-		param.broadcastMessageToAll(reply);
+		// param.broadcastMessageToAll(reply);
 	}
 	else if (code == RPL_NOTOPIC)
 	{
 		std::string chan = param.getName();
 		reply.append(chan + " :No topic is set\r\n");
-		param.broadcastMessageToAll(reply);
+		// param.broadcastMessageToAll(reply);
 	}
 	else if (code == RPL_NAMREPLY)
 	{
@@ -46,11 +51,18 @@ void	successReplies( int code, Channel &param, std::string &reply )
 		for (it = users.begin(); it != ite; it++)
 		{
 			if (it->second == true)
-				reply.append(" @" + it->first.GetNickname());
+				reply.append("@" + it->first.GetNickname() + " ");
 			else
-				reply.append(" " + it->first.GetNickname());
+				reply.append(it->first.GetNickname() + " ");
 		}
 		reply.append("\r\n");
+		std::cout << "reply: " << reply << std::endl;
+	}
+	else if (code == RPL_ENDOFNAMES)
+	{
+		std::string chan = param.getName();
+		reply.append(chan + " :End of /NAMES list\r\n");
+		std::cout << "RPLENDOFNAMES reply: " << reply << std::endl;
 	}
 }
 
@@ -91,29 +103,25 @@ void	parsingErrors( int code, std::string &param, std::string &reply )
 		reply.append(param + ":Nickname is already in use\r\n");
 }
 
-void	sendReply( Client &client, std::string reply)
-{
-	send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
-}
 
 
 void	Server::handleReplies( int code, std::string param, Channel *chan, Client &target )
 {
 	std::string reply = ":127.0.0.1 " + ft_itoa(code) + " " + target.GetNickname() + " ";
 	// RETOURS DE COMMANDES
-	if (code == RPL_TOPIC || code == RPL_NOTOPIC || code == RPL_NAMREPLY)
+	if (code == RPL_TOPIC || code == RPL_NOTOPIC || code == RPL_NAMREPLY || code == RPL_ENDOFNAMES)
 	{ 
 		successReplies(code, *chan, reply);
-		if (code == RPL_TOPIC || code == RPL_NOTOPIC)
-			return ;
+		// if (code == RPL_TOPIC || code == RPL_NOTOPIC)
+		// 	return ;
 	}
 	// ERREURS
-	if (code == 403 || code == 405 || code == 471 || code == 473 ||
+	else if (code == 403 || code == 405 || code == 471 || code == 473 ||
 	code == 474 || code == 475 || code == ERR_NOTONCHANNEL || code == ERR_USERNOTINCHANNEL ||
 	code == ERR_CHANOPRIVSNEEDED)
 		channelErrors(code, param, reply);
-	else if (code == 461 || code == ERR_NOSUCHNICK || code == ERR_NOTEXTTOSEND || code == ERR_NORECIPIENT)
+	else if (code == 461 || code == ERR_NOSUCHNICK || code == ERR_NOTEXTTOSEND || code == ERR_NORECIPIENT || code == RPL_ENDOFNAMES)
 		parsingErrors(code, param, reply);
-	if (code != RPL_TOPIC && code != RPL_NOTOPIC)
-		sendReply(target, reply);
+	// if (code != RPL_TOPIC && code != RPL_NOTOPIC)
+	sendReply(target, reply);
 }

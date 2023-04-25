@@ -3,7 +3,8 @@
 void    SendBot(std::string message, Client &target)
 {
     std::string nickname = target.GetNickname();
-    std::string output = ":127.0.0.1 PRIVMSG " + nickname + " :" + message + "\r\n";
+    std::string output = ":bot!bot@HOST PRIVMSG " + nickname + " :" + message + "\r\n";
+    // std::string output = message + "\r\n";
     sendReply(target, output);
 }
 
@@ -140,7 +141,7 @@ void    display_weather(std::string id, Client &client)
     }
     else if (idit == 800)
     {
-        print_sunny();
+        // print_sunny();
         SendBot(get_sunny(), client);
     }
     else if (idit >= 801 && idit <= 804)
@@ -157,19 +158,25 @@ void    display_weather(std::string id, Client &client)
 
 void	start_bot(std::string request, Client &client)
 {
-    std::cout << request.size() << std::endl;
-	std::cout << "Bonjour ! Je suis RainyBunny, votre petit compagnon météo 🐰. Je suis ici pour vous aider à rester au sec et à l'abri du mauvais temps. Demandez-moi simplement la météo à n'importe quel endroit et je vous donnerai les dernières prévisions avec plaisir !" << std::endl;
+    // std::cout << request.size() << std::endl;
+	// std::cout << "Bonjour ! Je suis RainyBunny, votre petit compagnon météo 🐰. Je suis ici pour vous aider à rester au sec et à l'abri du mauvais temps. Demandez-moi simplement la météo à n'importe quel endroit et je vous donnerai les dernières prévisions avec plaisir !" << std::endl;
+    SendBot("TEST", client);
+    SendBot("Bonjour ! Je suis RainyBunny, votre petit compagnon météo 🐰. Je suis ici pour vous aider à rester au sec et à l'abri du mauvais temps. Demandez-moi simplement la météo à n'importe quel endroit et je vous donnerai les dernières prévisions avec plaisir !", client);
     if (request.size() <= 0)
         return;
 	const char* city = request.c_str();
-    std::cout << "Bien sûr ! J'ai regardé par la fenêtre et je peux te dire que le temps est... ah non, attendez, c'est juste le reflet de mon écran. Laissez-moi vérifier la vraie météo pour " << city <<"." << std::endl;
+    // std::cout << "Bien sûr ! J'ai regardé par la fenêtre et je peux te dire que le temps est... ah non, attendez, c'est juste le reflet de mon écran. Laissez-moi vérifier la vraie météo pour " << city <<"." << std::endl;
+    SendBot("Bien sûr ! J'ai regardé par la fenêtre et je peux te dire que le temps est... ah non, attendez, c'est juste le reflet de mon écran. Laissez-moi vérifier la vraie météo pour " + request + ".", client);
     const char* key = "b693c063ba0578ae1fc1907e4426a73f";
 	std::string response = get_weather(city, key);
 	std::map<std::string, std::string> result = parse_json(response);
     display_weather(result["id"], client);
     if(result.size() < 5)
+    {
+        std::cout << "city not found" << std::endl;
         SendBot("city not found", client);
-    else 
+    }
+    else
     {
         SendBot("Name: " + result["name"], client);
         SendBot("Description: " + result["description"], client);
