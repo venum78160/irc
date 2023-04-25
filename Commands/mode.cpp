@@ -47,19 +47,19 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
     Channel *channel = this->getChannelByName(params[1]);
     std::map<Client, bool> users = channel->getUsers();
     if (client.GetServername() != channel->getName()) {
-        std::string reply = ": " + client.GetNickname() + " 442 " + client.GetNickname() + " " + channel->getName() + " :You're not on that channel\r\n";
+        std::string reply = ":127.0.0.1 " + client.GetNickname() + " 442 " + client.GetNickname() + " " + channel->getName() + " :You're not on that channel\r\n";
         send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
         return;
     }
     if ((params[2][0] != '+' && params[2][0] != '-') || (params[2].size() - 1 != params.size() - 3))
     {
-        std::string reply = ": " + client.GetNickname() + " 472 " + client.GetNickname() + " " + params[2][0] + " :is unknown mode char to me\r\n";
+        std::string reply = ":127.0.0.1 " + client.GetNickname() + " 472 " + client.GetNickname() + " " + params[2][0] + " :is unknown mode char to me\r\n";
         send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
         return ;
     }
     if (users[client] == false)
     {
-        std::string reply = ": 482 " + client.GetNickname() + " :You're not channel operator\r\n";
+        std::string reply = ":127.0.0.1 482 " + client.GetNickname() + " :You're not channel operator\r\n";
         send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
         return ;
     }
@@ -69,11 +69,11 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
             if (params[2][i] == 'o') {
                 if (nicknameExist(params[i + 2])) {
                     channel->giveOpRights(getClientByNickname(params[i + 2]));
-                    std::string reply = ":"+ client.GetNickname() +  " MODE "  + channel->getName() + " +o\r\n";
+                    std::string reply = ":" + client.GetNickname() +  " MODE "  + channel->getName() + " +o\r\n";
                     send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                 }
                 else {
-                    std::string reply = ": " + params[i + 2] + " :No such nick/channel\r\n";
+                    std::string reply = ":127.0.0.1 " + params[i + 2] + " :No such nick/channel\r\n";
                     send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                 }
             }
@@ -86,14 +86,14 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
                         send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                     }
                      else {
-                        std::string reply = ": 461 " + client.GetNickname() + " :Invalid mode parameter\r\n";
+                        std::string reply = ":127.0.0.1 461 " + client.GetNickname() + " :Invalid mode parameter\r\n";
                         send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                         return;
                     }
                 }
                 catch(const std::exception& e)
                 {
-                    std::string reply = ": 461 " + client.GetNickname() + " :Invalid mode parameter\r\n";
+                    std::string reply = ":127.0.0.1 461 " + client.GetNickname() + " :Invalid mode parameter\r\n";
                     send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                     return;
                 }
@@ -101,14 +101,14 @@ void    Server::executeModeChannels(Client &client, std::vector<std::string> &pa
             if (params[2][i] == 'b') {
                 if (!channel->isInBlacklist(params[i + 2])) {
                     channel->addToBlacklist(params[i + 2]);
-					std::cout << "blacklist: " << params[i + 2] << std::endl;
 					params[i + 2].erase(params[i + 2].size() - 2, 2);
                     std::string reply = ":"+ client.GetNickname() +  " MODE "  + channel->getName() + " +b\r\n";
 					std::cout << "reply : " << reply << std::endl;
-					channel->broadcastMessageToAll(reply);
+					send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
+					this->partCommand(channel->getName(), getClientByNickname(params[i + 2]), "Got banned");
 				}
                 else {
-                    std::string reply = ": 437 " + client.GetNickname() + " " + params[i + 2] + " :is already banned\r\n";
+					std::string reply = ":127.0.0.1 442" + client.GetNickname() + " " + channel->getName() + " :User is already banned\r\n";
                     send(client.GetSocketFD(), reply.c_str(), reply.size(), 0);
                 }
             }

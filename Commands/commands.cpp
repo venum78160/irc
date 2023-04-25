@@ -6,7 +6,7 @@
 /*   By: anggonza <anggonza@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 18:02:04 by anggonza         ###   ########.fr       */
+/*   Updated: 2023/04/25 18:43:28 by anggonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void	Server::handleMessage(std::string message, Client &client)
 	{
 		std::vector<std::string>	params = split(message, ' ');
 		std::string channelName = params[1];
-		std::string message = "No reason specified";
+		std::string message = ":No reason specified";
 		// check if PART #channel message\r\n or PART #channel\r\n
 		if (params.size() > 2)
 			message = params[2];
@@ -132,18 +132,17 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 		if ((*it)->getName() == channelName) // channel trouvé dans le vector
 		{
 			channelToLeave = *it;
-			channelToLeave->removeUser(client);
 			for (size_t i = 0; i < client.GetChannels().size(); i++)
 			{
 				std::cout << "Client channel : " << client.GetChannels()[i] << std::endl;
 				if (client.GetChannels()[i] == channelName)
 				{
 					std::cout << "Removing channel from client" << std::endl;
-					(void)message;
 					client.RemoveChannel(channelName);
-					std::string reply = ":" + client.GetNickname() + " PART " + channelName + " " + message + "\r\n";
+					std::string reply = ":" + client.getFullId() + " PART " + channelName + " " + message + "\r\n";
 					std::cout << "Reply : " << reply << std::endl;
 					channelToLeave->broadcastMessageToAll(reply);
+					channelToLeave->removeUser(client);
 					if (channelToLeave->getUsers().size() == 0)
 					{
 						std::cout << "Removing channel from server" << std::endl;
