@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/13 17:09:06 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/25 17:13:38 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 17:59:13 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ void Server::partCommand(std::string channelName, Client &client, std::string me
 				{
 					std::cout << "Removing channel from client" << std::endl;
 					client.RemoveChannel(channelName);
-					std::string reply = ":" + client.GetNickname() + " PART " + channelName + " :" + message + "\r\n";
+					std::string reply = ":" + client.GetNickname() + " PART " + channelName + " " + message + "\r\n";
 					std::cout << "Reply : " << reply << std::endl;
 					std::map<Client, bool>connectedClients = channelToLeave->getUsers();
 					for (std::map<Client, bool>::iterator it = connectedClients.begin(); it != connectedClients.end(); ++it)

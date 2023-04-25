@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/05 19:07:31 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/23 20:34:06 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 17:37:34 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,10 @@ void Channel::giveOpRights( Client user )
 	it = (this->_users).find(user);
 
 	if (it != (this->_users).end())
+	{
+		std::cout << "found user " << user.GetNickname() << " " << it->second << std::endl;
 		it->second = true;
+	}
 }
 
 void Channel::removeOpRights( Client user )
@@ -200,7 +203,11 @@ bool Channel::isUserOp( Client &user )
 	for (it = _users.begin(); it != ite; it++)
 	{
 		if (!((it->first).GetNickname()).compare(targetNick))
+		{
+			std::cout << "user = " << user.GetNickname() << "and it = " << it->first.GetNickname() << std::endl;
+			std::cout << "isUserOp: " << it->first.GetNickname() << it->second << std::endl;
 			return (it->second);
+		}
 	}
 	throw (channelException("ERR_NOTONCHANNEL"));
 }

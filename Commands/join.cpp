@@ -6,7 +6,7 @@
 /*   By: itaouil <itaouil@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/15 18:28:57 by itaouil           #+#    #+#             */
-/*   Updated: 2023/04/24 18:03:41 by itaouil          ###   ########.fr       */
+/*   Updated: 2023/04/25 17:49:41 by itaouil          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void	Server::createChannel(std::string channelName, Client &client)
 	_channels.push_back(newChannel);
 	std::cout << "Channel successfully created: " << channelName << std::endl; // test only, to delete later
 	joinChannel(newChannel, client);
+	std::cout << "giving op rights" << std::endl;
 	newChannel->giveOpRights(client);
 }
 
@@ -141,9 +142,12 @@ void	Server::joinChannel(Channel *channel, Client &client)
 	client.SetServername(channel->getName());
 	client.AddChannel(channel->getName());
 	// std::cout << "Channel successfully joined: " << channel->getName() << std::endl; // test only, to delete later
-
-	handleReplies(RPL_NAMREPLY, "", channel, client);
+	// send replies
+	std::string reply = ":" + client.getFullId() + " JOIN " + channel->getName() + "\r\n";
+	channel->broadcastMessageToAll(reply);
 	handleReplies(RPL_TOPIC, "", channel, client);
+	handleReplies(RPL_NAMREPLY, "", channel, client);
+	handleReplies(RPL_ENDOFNAMES, "", channel, client);
 }
 
 void	Server::ft_join(std::string message, Client &client)
