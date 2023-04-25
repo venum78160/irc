@@ -3,7 +3,7 @@
 void    SendBot(std::string message, Client &target)
 {
     std::string nickname = target.GetNickname();
-    std::string output = ":127.0.0.1 PRIVMSG [" + nickname + "] :[" + message + "]\r\n";
+    std::string output = ":127.0.0.1 PRIVMSG " + nickname + " :" + message + "\r\n";
     sendReply(target, output);
 }
 
