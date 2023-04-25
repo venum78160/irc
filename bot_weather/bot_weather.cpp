@@ -4,7 +4,6 @@ void    SendBot(std::string message, Client &target)
 {
     std::string nickname = target.GetNickname();
     std::string output = ":bot!bot@HOST PRIVMSG " + nickname + " :" + message + "\r\n";
-    // std::string output = message + "\r\n";
     sendReply(target, output);
 }
 

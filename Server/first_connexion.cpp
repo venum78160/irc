@@ -114,7 +114,7 @@ void Server::handleFirstConnection(int clientSocket)
         send(clientSocket, reply.c_str(), reply.size(), 0);
         reply = ":127.0.0.1 003 " + nickname + " :This server was created not a long time ago\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);
-        reply = ":127.0.0.1 004 ourIRC 1.0";
+        reply = ":127.0.0.1 004 ourIRC 1.0\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);
         reply = ":127.0.0.1 005 " + nickname + " PREFIX=(ov)@+ CHANTYPES=# CHARSET=UTF-8 :are supported by this server\r\n";
         send(clientSocket, reply.c_str(), reply.size(), 0);
